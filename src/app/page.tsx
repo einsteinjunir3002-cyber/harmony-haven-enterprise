@@ -96,7 +96,7 @@ export default async function HomePage() {
   return (
     <div className="space-y-24 pb-20">
       {/* 1. HERO SECTION */}
-      <section className="relative overflow-hidden bg-linear-to-b from-harmony-900 via-harmony-950 to-stone-950 text-white pt-20 pb-28 lg:pt-28 lg:pb-36">
+      <section className="relative overflow-hidden bg-gradient-to-b from-harmony-900 via-harmony-950 to-stone-950 text-white pt-20 pb-28 lg:pt-28 lg:pb-36">
         {/* Subtle background glow */}
         <div className="absolute top-0 right-1/4 w-96 h-96 bg-gold-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -113,7 +113,7 @@ export default async function HomePage() {
               <div className="space-y-4">
                 <h1 className="font-serif font-bold text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight leading-tight">
                   Small Hands,{' '}
-                  <span className="text-transparent bg-clip-text bg-linear-to-r from-gold-300 via-gold-200 to-gold-400">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-300 via-gold-200 to-gold-400">
                     Wide Reach
                   </span>
                 </h1>
@@ -166,7 +166,7 @@ export default async function HomePage() {
                     alt="Kowah's Dishes Food Pot"
                     className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="p-4 bg-linear-to-t from-stone-950 via-stone-900 to-transparent">
+                  <div className="p-4 bg-gradient-to-t from-stone-950 via-stone-900 to-transparent">
                     <span className="text-[10px] font-bold tracking-widest text-gold-400 uppercase">
                       Kowah&apos;s Dishes
                     </span>
@@ -183,7 +183,7 @@ export default async function HomePage() {
                     alt="4U Heartlines Gift Experience"
                     className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="p-4 bg-linear-to-t from-harmony-950 via-harmony-900 to-transparent">
+                  <div className="p-4 bg-gradient-to-t from-harmony-950 via-harmony-900 to-transparent">
                     <span className="text-[10px] font-bold tracking-widest text-teal-300 uppercase">
                       4U HEARTLINES
                     </span>
@@ -231,7 +231,7 @@ export default async function HomePage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* BRAND CARD 1: KOWAH'S DISHES */}
-          <div className="rounded-3xl bg-linear-to-br from-stone-900 via-stone-950 to-stone-900 text-white p-8 sm:p-10 border border-stone-800 shadow-xl flex flex-col justify-between relative overflow-hidden group">
+          <div className="rounded-3xl bg-gradient-to-br from-stone-900 via-stone-950 to-stone-900 text-white p-8 sm:p-10 border border-stone-800 shadow-xl flex flex-col justify-between relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-64 h-64 bg-amber-600/10 rounded-full blur-2xl" />
 
             <div className="space-y-6 relative z-10">
@@ -289,7 +289,7 @@ export default async function HomePage() {
           </div>
 
           {/* BRAND CARD 2: 4U HEARTLINES */}
-          <div className="rounded-3xl bg-linear-to-br from-harmony-950 via-stone-950 to-harmony-900 text-white p-8 sm:p-10 border border-teal-900/60 shadow-xl flex flex-col justify-between relative overflow-hidden group">
+          <div className="rounded-3xl bg-gradient-to-br from-harmony-950 via-stone-950 to-harmony-900 text-white p-8 sm:p-10 border border-teal-900/60 shadow-xl flex flex-col justify-between relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-64 h-64 bg-teal-500/10 rounded-full blur-2xl" />
 
             <div className="space-y-6 relative z-10">
@@ -387,7 +387,7 @@ export default async function HomePage() {
                   alt={founderContent.name}
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-linear-to-t from-stone-950/80 via-transparent to-transparent flex flex-col justify-end p-6 text-white">
+                <div className="absolute inset-0 bg-gradient-to-t from-stone-950/80 via-transparent to-transparent flex flex-col justify-end p-6 text-white">
                   <span className="text-xs uppercase font-bold tracking-widest text-gold-400">
                     {founderContent.role}
                   </span>
@@ -480,7 +480,7 @@ export default async function HomePage() {
 
       {/* 7. LIVE CONTACT & ORDER BANNER */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="rounded-3xl bg-linear-to-r from-harmony-900 via-harmony-950 to-stone-950 text-white p-8 sm:p-12 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 border border-gold-400/20">
+        <div className="rounded-3xl bg-gradient-to-r from-harmony-900 via-harmony-950 to-stone-950 text-white p-8 sm:p-12 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 border border-gold-400/20">
           <div className="space-y-3 text-center md:text-left max-w-xl">
             <span className="text-xs font-bold uppercase tracking-widest text-gold-400">
               Ready to Experience Harmony Haven?

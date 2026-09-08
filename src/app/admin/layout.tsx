@@ -58,7 +58,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="p-6 space-y-6">
           {/* Admin Header */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-linear-to-br from-harmony-800 to-harmony-900 text-gold-400 font-serif font-bold text-lg flex items-center justify-center border border-gold-400/30">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-harmony-800 to-harmony-900 text-gold-400 font-serif font-bold text-lg flex items-center justify-center border border-gold-400/30">
               H
             </div>
             <div>

@@ -34,7 +34,7 @@ export function Navbar() {
         <div className="flex items-center justify-between h-20">
           {/* Logo & Brand Identity */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-11 h-11 rounded-full bg-linear-to-br from-harmony-800 to-harmony-950 flex items-center justify-center text-gold-400 font-serif font-bold text-xl shadow-md border border-gold-400/30 group-hover:scale-105 transition-transform">
+            <div className="w-11 h-11 rounded-full bg-gradient-to-br from-harmony-800 to-harmony-950 flex items-center justify-center text-gold-400 font-serif font-bold text-xl shadow-md border border-gold-400/30 group-hover:scale-105 transition-transform">
               H
             </div>
             <div className="flex flex-col">

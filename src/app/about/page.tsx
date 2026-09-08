@@ -89,7 +89,7 @@ export default async function AboutPage() {
       {/* Vision & Mission Grid */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="p-8 sm:p-10 rounded-3xl bg-linear-to-br from-harmony-900 to-harmony-950 text-white space-y-4 shadow-xl border border-gold-400/20">
+          <div className="p-8 sm:p-10 rounded-3xl bg-gradient-to-br from-harmony-900 to-harmony-950 text-white space-y-4 shadow-xl border border-gold-400/20">
             <div className="w-12 h-12 rounded-2xl bg-white/10 text-gold-400 flex items-center justify-center">
               <Eye className="w-6 h-6" />
             </div>
@@ -99,7 +99,7 @@ export default async function AboutPage() {
             </p>
           </div>
 
-          <div className="p-8 sm:p-10 rounded-3xl bg-linear-to-br from-stone-900 to-stone-950 text-white space-y-4 shadow-xl border border-gold-400/20">
+          <div className="p-8 sm:p-10 rounded-3xl bg-gradient-to-br from-stone-900 to-stone-950 text-white space-y-4 shadow-xl border border-gold-400/20">
             <div className="w-12 h-12 rounded-2xl bg-white/10 text-gold-400 flex items-center justify-center">
               <Target className="w-6 h-6" />
             </div>

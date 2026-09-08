@@ -41,7 +41,7 @@ export default async function HeartlinesPage() {
   return (
     <div className="bg-heartlines-50/40 pb-24 space-y-20">
       {/* Brand Hero Banner */}
-      <section className="relative overflow-hidden bg-linear-to-b from-harmony-950 via-stone-950 to-harmony-900 text-white pt-20 pb-24 border-b border-teal-900">
+      <section className="relative overflow-hidden bg-gradient-to-b from-harmony-950 via-stone-950 to-harmony-900 text-white pt-20 pb-24 border-b border-teal-900">
         <div className="absolute top-0 right-1/4 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-pink-500/10 rounded-full blur-3xl pointer-events-none" />
 

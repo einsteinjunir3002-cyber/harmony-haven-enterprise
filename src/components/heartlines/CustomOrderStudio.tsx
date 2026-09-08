@@ -137,7 +137,7 @@ export function CustomOrderStudio() {
   return (
     <div className="bg-white rounded-3xl border border-teal-100 shadow-xl overflow-hidden">
       {/* Header Banner */}
-      <div className="bg-linear-to-r from-harmony-900 via-harmony-950 to-stone-950 text-white p-8 sm:p-10 relative">
+      <div className="bg-gradient-to-r from-harmony-900 via-harmony-950 to-stone-950 text-white p-8 sm:p-10 relative">
         <div className="max-w-2xl space-y-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gold-400/20 text-gold-300 text-xs font-bold uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5" />

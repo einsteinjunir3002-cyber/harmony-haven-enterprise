@@ -45,7 +45,7 @@ export default async function KowahsDishesPage() {
   return (
     <div className="bg-kowah-50/50 pb-24 space-y-20">
       {/* Brand Hero Banner */}
-      <section className="relative overflow-hidden bg-linear-to-b from-stone-900 via-stone-950 to-stone-900 text-white pt-20 pb-24 border-b border-kowah-900">
+      <section className="relative overflow-hidden bg-gradient-to-b from-stone-900 via-stone-950 to-stone-900 text-white pt-20 pb-24 border-b border-kowah-900">
         <div className="absolute top-0 right-1/3 w-96 h-96 bg-amber-600/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
