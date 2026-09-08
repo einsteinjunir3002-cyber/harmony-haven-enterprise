@@ -8,6 +8,7 @@ export interface UserProfile {
   name: string;
   email: string;
   phone?: string;
+  avatar?: string | null;
   role: 'CUSTOMER' | 'STAFF' | 'ADMIN' | 'SUPER_ADMIN';
 }
 

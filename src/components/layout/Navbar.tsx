@@ -170,10 +170,18 @@ export function Navbar() {
             {/* Customer Account Button */}
             <Link
               href={user ? '/account' : '/account/login'}
-              className="p-2 text-stone-700 dark:text-stone-300 hover:text-harmony-900 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800 rounded-full transition-colors flex items-center gap-1.5"
+              className="p-1.5 sm:p-2 text-stone-700 dark:text-stone-300 hover:text-harmony-900 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800 rounded-full transition-colors flex items-center gap-1.5"
               title={user ? `Signed in as ${user.name}` : 'Sign In'}
             >
-              <User className="w-5 h-5" />
+              {user?.avatar ? (
+                <img
+                  src={user.avatar}
+                  alt={user.name}
+                  className="w-7 h-7 rounded-full object-cover border border-gold-400 shadow-xs"
+                />
+              ) : (
+                <User className="w-5 h-5" />
+              )}
               {user && <span className="hidden md:inline text-xs font-semibold">{user.name.split(' ')[0]}</span>}
             </Link>
 
@@ -274,9 +282,17 @@ export function Navbar() {
             <Link
               href={user ? '/account' : '/account/login'}
               onClick={() => setMobileMenuOpen(false)}
-              className="py-2 text-stone-600 flex items-center gap-2"
+              className="py-2 text-stone-600 dark:text-stone-300 flex items-center gap-2"
             >
-              <User className="w-4 h-4" />
+              {user?.avatar ? (
+                <img
+                  src={user.avatar}
+                  alt={user.name}
+                  className="w-6 h-6 rounded-full object-cover border border-gold-400"
+                />
+              ) : (
+                <User className="w-4 h-4" />
+              )}
               <span>{user ? `Account (${user.name})` : 'Sign In / Register'}</span>
             </Link>
           </nav>

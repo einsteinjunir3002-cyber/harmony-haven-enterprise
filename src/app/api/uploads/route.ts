@@ -3,8 +3,15 @@ import path from 'path';
 import fs from 'fs';
 import crypto from 'crypto';
 
-const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf'];
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+// Supported video extensions for any format
+const VIDEO_EXTENSIONS = [
+  '.mp4', '.webm', '.ogg', '.mov', '.avi', '.mkv', '.flv',
+  '.wmv', '.m4v', '.3gp', '.ts', '.mts', '.m2ts', '.vob',
+  '.ogv', '.qt', '.mpeg', '.mpg', '.asf', '.rm',
+];
+
+const MAX_VIDEO_SIZE = 250 * 1024 * 1024; // 250MB
+const MAX_IMAGE_SIZE = 25 * 1024 * 1024;  // 25MB
 
 export async function POST(request: Request) {
   try {
@@ -12,19 +19,26 @@ export async function POST(request: Request) {
     const file = formData.get('file') as File | null;
 
     if (!file) {
-      return NextResponse.json({ error: 'No file provided' }, { status: 400 });
+      return NextResponse.json({ error: 'No file was provided' }, { status: 400 });
     }
 
-    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+    const ext = path.extname(file.name).toLowerCase();
+    const isVideo = file.type.startsWith('video/') || VIDEO_EXTENSIONS.includes(ext);
+    const isImage = file.type.startsWith('image/') || ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg'].includes(ext);
+    const isPdf = file.type === 'application/pdf' || ext === '.pdf';
+
+    if (!isVideo && !isImage && !isPdf) {
       return NextResponse.json(
-        { error: 'Invalid file type. Only JPEG, PNG, WEBP, and GIF images are supported.' },
+        { error: 'Unsupported file format. Please upload an image or video file.' },
         { status: 400 }
       );
     }
 
-    if (file.size > MAX_FILE_SIZE) {
+    const maxSize = isVideo ? MAX_VIDEO_SIZE : MAX_IMAGE_SIZE;
+    if (file.size > maxSize) {
+      const maxMb = Math.round(maxSize / (1024 * 1024));
       return NextResponse.json(
-        { error: 'File size exceeds maximum allowable limit of 10MB.' },
+        { error: `File size exceeds the allowable limit of ${maxMb}MB.` },
         { status: 400 }
       );
     }
@@ -32,10 +46,10 @@ export async function POST(request: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Generate collision-proof randomized filename
-    const ext = path.extname(file.name) || '.jpg';
+    // Generate collision-proof randomized filename preserving true extension
+    const finalExt = ext || (isVideo ? '.mp4' : '.jpg');
     const randomHash = crypto.randomBytes(12).toString('hex');
-    const safeFilename = `${Date.now()}_${randomHash}${ext}`;
+    const safeFilename = `${Date.now()}_${randomHash}${finalExt}`;
 
     const publicUploadDir = path.join(process.cwd(), 'public', 'uploads');
     const sunflowerUploadDir = path.join(process.cwd(), 'Sunflower Media', 'uploads');
@@ -63,10 +77,11 @@ export async function POST(request: Request) {
       filename: safeFilename,
       originalName: file.name,
       size: file.size,
-      mimeType: file.type,
+      mimeType: file.type || (isVideo ? 'video/mp4' : 'image/jpeg'),
+      isVideo,
     });
   } catch (error: any) {
     console.error('File upload error:', error);
-    return NextResponse.json({ error: 'Failed to process file upload' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Failed to process file upload' }, { status: 500 });
   }
 }

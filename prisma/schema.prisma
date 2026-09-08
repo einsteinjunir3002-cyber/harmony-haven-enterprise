@@ -12,6 +12,7 @@ model User {
   name         String
   email        String     @unique
   phone        String?
+  avatar       String?
   passwordHash String
   role         String     @default("CUSTOMER") // CUSTOMER, STAFF, ADMIN, SUPER_ADMIN
   status       String     @default("ACTIVE")   // ACTIVE, SUSPENDED, PENDING

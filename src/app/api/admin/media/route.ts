@@ -20,18 +20,23 @@ export async function POST(request: Request) {
   try {
     const user = await requireAuth('ADMIN');
     const body = await request.json();
-    const { title, originalName, url, category, brandId } = body;
+    const { title, originalName, url, category, brandId, mimeType, size } = body;
 
     if (!title || !url) {
       return NextResponse.json({ error: 'Title and URL are required.' }, { status: 400 });
     }
+
+    const isVideo = mimeType?.startsWith('video/') || /\.(mp4|webm|ogg|mov|avi|mkv|flv|wmv|m4v|3gp|ts)$/i.test(url);
+    const resolvedCategory = category || (isVideo ? 'VIDEOS' : 'UPLOADS');
 
     const item = await prisma.media.create({
       data: {
         title: title.trim(),
         originalName: (originalName || title).trim(),
         url,
-        category: category || 'UPLOADS',
+        category: resolvedCategory,
+        mimeType: mimeType || (isVideo ? 'video/mp4' : 'image/jpeg'),
+        size: size || 0,
         brandId: brandId || null,
       },
     });
