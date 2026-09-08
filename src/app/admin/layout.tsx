@@ -16,7 +16,10 @@ import {
   LogOut,
   ExternalLink,
   Shield,
-  Sparkles,
+  TrendingUp,
+  Layers,
+  Boxes,
+  Users,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
@@ -41,12 +44,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const navLinks = [
     { href: '/admin/dashboard', label: 'Dashboard Overview', icon: LayoutDashboard },
-    { href: '/admin/brands', label: 'Brand Architecture', icon: Tag },
-    { href: '/admin/products', label: 'Products & Variants', icon: Package },
+    { href: '/admin/sales', label: 'Sales & Revenue', icon: TrendingUp },
+    { href: '/admin/products', label: 'Products & Photos', icon: Package },
+    { href: '/admin/categories', label: 'Categories', icon: Layers },
+    { href: '/admin/inventory', label: 'Inventory Control', icon: Boxes },
     { href: '/admin/orders', label: 'Order Management', icon: ShoppingBag },
+    { href: '/admin/customers', label: 'Customer Accounts', icon: Users },
     { href: '/admin/custom-requests', label: '4U Heartlines Requests', icon: Heart },
     { href: '/admin/media', label: 'Sunflower Media Hub', icon: ImageIcon },
-    { href: '/admin/settings', label: 'CMS & Settings', icon: Sliders },
+    { href: '/admin/brands', label: 'Brand Architecture', icon: Tag },
+    { href: '/admin/settings', label: 'Store Settings & Alerts', icon: Sliders },
     { href: '/admin/inquiries', label: 'Customer Inquiries', icon: Mail },
     { href: '/admin/audit-logs', label: 'Staff Audit Logs', icon: History },
   ];
