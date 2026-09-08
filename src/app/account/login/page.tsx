@@ -230,6 +230,24 @@ export default function LoginPage() {
               </button>
             </form>
           )}
+
+          {/* Guest Divider */}
+          <div className="relative flex items-center justify-center pt-2">
+            <div className="border-t border-stone-200 w-full" />
+            <span className="bg-white px-3 text-[11px] font-semibold text-stone-400 uppercase tracking-wider">
+              Or
+            </span>
+            <div className="border-t border-stone-200 w-full" />
+          </div>
+
+          {/* Continue as Guest Button */}
+          <Link
+            href="/order"
+            className="w-full py-3.5 rounded-xl border border-stone-300 hover:border-harmony-800 hover:bg-stone-50 text-stone-700 hover:text-harmony-950 font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-xs"
+          >
+            <span>Continue as Guest</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
       </div>
     </div>
