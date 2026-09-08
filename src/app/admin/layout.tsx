@@ -25,6 +25,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { AdminOrderAlarm } from '@/components/admin/AdminOrderAlarm';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -303,6 +304,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* MAIN CONTENT AREA                                                         */}
       {/* ========================================================================= */}
       <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
+        {/* REAL-TIME ORDER ALARM & DISPATCH MONITOR */}
+        <AdminOrderAlarm />
+
         {/* MOBILE STICKY TOP HEADER (md:hidden) */}
         <div className="md:hidden sticky top-0 z-30 bg-harmony-950 text-white border-b border-harmony-900/80 px-4 py-3 shadow-md flex items-center justify-between">
           <div className="flex items-center gap-3">

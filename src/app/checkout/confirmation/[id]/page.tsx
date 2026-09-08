@@ -55,6 +55,7 @@ interface OrderData {
   preferredDate?: string | null;
   preferredTime?: string | null;
   notes?: string | null;
+  internalNotes?: string | null;
   createdAt: string | Date;
   items: OrderItem[];
   statusHistory?: OrderHistory[];
@@ -184,10 +185,18 @@ export default function OrderConfirmationPage({
   const currentStatusObj =
     ORDER_STATUS_FLOW.find((s) => s.key === order.fulfillmentStatus) || ORDER_STATUS_FLOW[0];
 
+  const isPayOnDelivery =
+    order.paymentStatus === 'PAY_ON_DELIVERY' ||
+    (order.internalNotes && order.internalNotes.includes('PAY_ON_DELIVERY'));
+
+  const paymentModeLabel = isPayOnDelivery
+    ? 'Payment on Delivery (MoMo on arrival)'
+    : 'Pay Before Delivery (via MoMo)';
+
   const whatsappMessage = encodeURIComponent(
     `Hello Harmony Haven! I just placed order *${order.orderNumber}* for ${formatCurrency(
       order.total
-    )}. Name: ${order.customerName}. Please confirm my order status.`
+    )}.\nName: ${order.customerName}\nPayment: ${paymentModeLabel}\nPlease confirm my order.`
   );
 
   return (
@@ -296,8 +305,15 @@ export default function OrderConfirmationPage({
                 <span>{formatCurrency(order.deliveryFee)}</span>
               </div>
               <div className="flex justify-between text-base font-bold text-stone-950 pt-2 border-t border-stone-100">
-                <span>Total Paid</span>
+                <span>{isPayOnDelivery ? 'Total Due on Delivery' : 'Total Paid'}</span>
                 <span className="text-harmony-950 font-serif">{formatCurrency(order.total)}</span>
+              </div>
+
+              <div className="mt-3 p-2.5 rounded-xl bg-stone-50 border border-stone-200/80 flex items-center justify-between text-[11px]">
+                <span className="text-stone-500 font-medium">Payment Mode:</span>
+                <span className="font-bold text-harmony-950">
+                  {isPayOnDelivery ? 'Payment on Delivery (MoMo)' : 'Paid Before Delivery (MoMo)'}
+                </span>
               </div>
             </div>
           </div>
@@ -316,6 +332,12 @@ export default function OrderConfirmationPage({
               <p>{order.customerName}</p>
               <p>{order.customerPhone}</p>
               <p>{order.customerEmail}</p>
+            </div>
+
+            <div>
+              <span className="font-bold text-stone-800 block">Payment Arrangement:</span>
+              <p className="font-semibold text-harmony-900">{paymentModeLabel}</p>
+              <p className="text-[11px] text-stone-400">Strictly Ghana Mobile Money (MTN, Telecel, AT)</p>
             </div>
 
             {deliveryAddress && (

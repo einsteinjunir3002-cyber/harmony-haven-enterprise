@@ -20,6 +20,10 @@ export async function POST(request: Request) {
       preferredDate,
       preferredTime,
       notes,
+      paymentTiming = 'PAY_BEFORE_DELIVERY',
+      paymentMethod = 'MOMO',
+      momoNetwork = 'MTN',
+      momoPhone,
     } = body;
 
     if (!items || !items.length) {
@@ -44,6 +48,12 @@ export async function POST(request: Request) {
 
     const orderNumber = generateOrderNumber();
 
+    const isPayOnDelivery = paymentTiming === 'PAY_ON_DELIVERY';
+    const initialPaymentStatus = isPayOnDelivery ? 'PAY_ON_DELIVERY' : 'PAID';
+    const paymentModeLabel = isPayOnDelivery
+      ? 'Payment on Delivery (MoMo on arrival)'
+      : 'Pay Before Delivery (Instant MoMo)';
+
     // 2. Transactional creation of Order, OrderItems, OrderStatusHistory, and inventory deduction
     const newOrder = await prisma.$transaction(async (tx) => {
       // Create the Order
@@ -59,14 +69,15 @@ export async function POST(request: Request) {
           discount: calculation.discount,
           total: calculation.total,
           currency: calculation.currency,
-          paymentStatus: 'PENDING',
-          fulfillmentStatus: 'NEW',
+          paymentStatus: initialPaymentStatus,
+          fulfillmentStatus: 'CONFIRMED',
           orderType: 'STANDARD_PRODUCT_ORDER',
           deliveryMethod: deliveryMethod || 'DELIVERY',
           deliveryAddressJson: deliveryAddress ? JSON.stringify(deliveryAddress) : null,
           preferredDate: preferredDate || null,
           preferredTime: preferredTime || null,
           notes: notes || null,
+          internalNotes: `Payment Timing: ${paymentTiming} | Method: MoMo (${momoNetwork}) | Customer MoMo: ${momoPhone || customerPhone}`,
           items: {
             create: calculation.verifiedItems.map((item) => ({
               productId: item.productId,
@@ -82,8 +93,8 @@ export async function POST(request: Request) {
           statusHistory: {
             create: {
               fromStatus: 'NEW',
-              toStatus: 'NEW',
-              note: 'Order placed by customer',
+              toStatus: 'CONFIRMED',
+              note: `Order placed by customer (${paymentModeLabel} - ${momoNetwork})`,
               actorName: customerName.trim(),
             },
           },

@@ -225,15 +225,15 @@ export default function CartPage() {
               <ArrowRight className="w-4 h-4" />
             </Link>
 
-            {/* Trust Badges */}
+            {/* Trust Badges & Payment Arrangement */}
             <div className="pt-2 border-t border-stone-100 dark:border-stone-800 space-y-2 text-xs text-stone-500 dark:text-stone-400">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 text-harmony-900 dark:text-gold-400 font-medium">
                 <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>Encrypted, Safe & Secure Checkout</span>
+                <span>Strictly Mobile Money (MTN, Telecel, AT)</span>
               </div>
               <div className="flex items-center gap-2">
                 <Truck className="w-4 h-4 text-harmony-800 dark:text-gold-500 shrink-0" />
-                <span>Prompt 24hr - 48hrs Dispatch</span>
+                <span>Payment on Delivery or Pay Before Delivery</span>
               </div>
             </div>
           </div>

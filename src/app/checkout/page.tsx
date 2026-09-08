@@ -14,6 +14,9 @@ import {
   ArrowRight,
   ShieldCheck,
   Lock,
+  Smartphone,
+  Banknote,
+  Check,
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
@@ -27,6 +30,9 @@ export default function CheckoutPage() {
   const [deliveryZones, setDeliveryZones] = useState<any[]>([]);
   const [selectedZoneId, setSelectedZoneId] = useState<string>('');
   const [deliveryMethod, setDeliveryMethod] = useState<'DELIVERY' | 'PICKUP'>('DELIVERY');
+  const [paymentTiming, setPaymentTiming] = useState<'PAY_BEFORE_DELIVERY' | 'PAY_ON_DELIVERY'>('PAY_BEFORE_DELIVERY');
+  const [momoNetwork, setMomoNetwork] = useState<'MTN' | 'TELECEL' | 'AT'>('MTN');
+  const [momoPhone, setMomoPhone] = useState(user?.phone || '');
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -53,6 +59,7 @@ export default function CheckoutPage() {
         email: prev.email || user.email,
         phone: prev.phone || user.phone || '',
       }));
+      setMomoPhone((prev) => prev || user.phone || '');
     }
   }, [user]);
 
@@ -121,6 +128,10 @@ export default function CheckoutPage() {
           preferredDate: formData.preferredDate,
           preferredTime: formData.preferredTime,
           notes: formData.notes,
+          paymentTiming,
+          paymentMethod: 'MOMO',
+          momoNetwork,
+          momoPhone: momoPhone || formData.phone,
         }),
       });
 
@@ -131,20 +142,21 @@ export default function CheckoutPage() {
 
       const orderId = orderData.order.id;
 
-      // 2. Process / Verify payment with gateway reference
-      const reference = `T${Date.now()}_${Math.floor(Math.random() * 100000)}`;
-      const verifyRes = await fetch('/api/payments/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          reference,
-          orderId,
-        }),
-      });
-
-      const verifyData = await verifyRes.json();
-      if (!verifyRes.ok) {
-        throw new Error(verifyData.error || 'Payment verification encountered an issue');
+      // 2. If paying before delivery via MoMo, register payment reference
+      if (paymentTiming === 'PAY_BEFORE_DELIVERY') {
+        const reference = `MOMO_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
+        try {
+          await fetch('/api/payments/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              reference,
+              orderId,
+            }),
+          });
+        } catch (payErr) {
+          console.warn('Payment recording note:', payErr);
+        }
       }
 
       // 3. Cache confirmed order details in storage for instantaneous, reliable receipt display
@@ -400,30 +412,167 @@ export default function CheckoutPage() {
             )}
           </div>
 
-          {/* Section 3: Payment Options (Ghana MoMo / Cards) */}
-          <div className="bg-white p-6 sm:p-8 rounded-3xl border border-stone-200 shadow-xs space-y-4">
-            <h2 className="font-serif font-bold text-lg text-stone-900 flex items-center gap-2">
-              <span className="w-6 h-6 rounded-full bg-harmony-900 text-white text-xs flex items-center justify-center font-sans">
-                3
-              </span>
-              <span>Payment Method</span>
-            </h2>
-
-            <div className="p-4 rounded-2xl border-2 border-harmony-900 bg-harmony-50/40 space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <CreditCard className="w-5 h-5 text-harmony-900" />
-                  <span className="font-bold text-sm text-stone-900">
-                    Ghana Mobile Money / Visa / Mastercard
-                  </span>
-                </div>
-                <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full">
-                  Paystack Verified
+          {/* Section 3: Payment Arrangement & Strictly Mobile Money */}
+          <div className="bg-white p-6 sm:p-8 rounded-3xl border border-stone-200 shadow-xs space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="font-serif font-bold text-lg text-stone-900 flex items-center gap-2">
+                <span className="w-6 h-6 rounded-full bg-harmony-900 text-white text-xs flex items-center justify-center font-sans">
+                  3
                 </span>
+                <span>Payment Arrangement</span>
+              </h2>
+
+              <span className="text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-900 px-3 py-1 rounded-full border border-amber-300/60">
+                Ghana MoMo Strictly
+              </span>
+            </div>
+
+            {/* Timing Selector Cards: Pay Before Delivery vs Payment on Delivery */}
+            <div className="space-y-3">
+              <label className="block text-xs font-bold uppercase tracking-wider text-stone-700">
+                Choose Payment Option *
+              </label>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Option A: Pay Before Delivery */}
+                <button
+                  type="button"
+                  onClick={() => setPaymentTiming('PAY_BEFORE_DELIVERY')}
+                  className={`p-4 rounded-2xl border-2 text-left transition-all relative flex flex-col justify-between gap-3 ${
+                    paymentTiming === 'PAY_BEFORE_DELIVERY'
+                      ? 'border-harmony-900 bg-harmony-50/50 shadow-xs'
+                      : 'border-stone-200 hover:border-stone-300 bg-white'
+                  }`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
+                        paymentTiming === 'PAY_BEFORE_DELIVERY' ? 'bg-harmony-900 text-gold-400' : 'bg-stone-100 text-stone-500'
+                      }`}>
+                        <Smartphone className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-sm text-stone-900">Pay Before Delivery</p>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-gold-600">
+                          Instant MoMo Transfer
+                        </span>
+                      </div>
+                    </div>
+                    {paymentTiming === 'PAY_BEFORE_DELIVERY' && (
+                      <div className="w-5 h-5 rounded-full bg-harmony-900 text-white flex items-center justify-center">
+                        <Check className="w-3 h-3" />
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-xs text-stone-500 leading-relaxed">
+                    Make your Mobile Money payment before dispatch. Fast and seamless priority packaging.
+                  </p>
+                </button>
+
+                {/* Option B: Payment on Delivery */}
+                <button
+                  type="button"
+                  onClick={() => setPaymentTiming('PAY_ON_DELIVERY')}
+                  className={`p-4 rounded-2xl border-2 text-left transition-all relative flex flex-col justify-between gap-3 ${
+                    paymentTiming === 'PAY_ON_DELIVERY'
+                      ? 'border-harmony-900 bg-harmony-50/50 shadow-xs'
+                      : 'border-stone-200 hover:border-stone-300 bg-white'
+                  }`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
+                        paymentTiming === 'PAY_ON_DELIVERY' ? 'bg-harmony-900 text-gold-400' : 'bg-stone-100 text-stone-500'
+                      }`}>
+                        <Banknote className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-sm text-stone-900">Payment on Delivery</p>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600">
+                          MoMo on Arrival
+                        </span>
+                      </div>
+                    </div>
+                    {paymentTiming === 'PAY_ON_DELIVERY' && (
+                      <div className="w-5 h-5 rounded-full bg-harmony-900 text-white flex items-center justify-center">
+                        <Check className="w-3 h-3" />
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-xs text-stone-500 leading-relaxed">
+                    Pay our rider via Mobile Money when your package arrives at your doorstep in Kumasi, Cape Coast, or Accra.
+                  </p>
+                </button>
               </div>
-              <p className="text-xs text-stone-500">
-                Supports MTN Mobile Money, Telecel Cash, AT Money, and local debit/credit cards. Fast, safe and instantaneous confirmation.
-              </p>
+            </div>
+
+            {/* Strict MoMo Network Selector */}
+            <div className="pt-2 border-t border-stone-100 space-y-4">
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-2">
+                  Select Your MoMo Network *
+                </label>
+                <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                  {[
+                    { key: 'MTN', name: 'MTN MoMo', color: 'border-amber-400 text-amber-900 bg-amber-50' },
+                    { key: 'TELECEL', name: 'Telecel Cash', color: 'border-rose-400 text-rose-900 bg-rose-50' },
+                    { key: 'AT', name: 'AT Money', color: 'border-blue-400 text-blue-900 bg-blue-50' },
+                  ].map((net) => (
+                    <button
+                      key={net.key}
+                      type="button"
+                      onClick={() => setMomoNetwork(net.key as any)}
+                      className={`py-2.5 px-3 rounded-xl border-2 text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5 ${
+                        momoNetwork === net.key
+                          ? `${net.color} border-current shadow-xs`
+                          : 'border-stone-200 bg-white text-stone-600 hover:border-stone-300'
+                      }`}
+                    >
+                      <span>{net.name}</span>
+                      {momoNetwork === net.key && <Check className="w-3 h-3 shrink-0" />}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">
+                  Your MoMo Registered Number
+                </label>
+                <input
+                  type="tel"
+                  value={momoPhone}
+                  onChange={(e) => setMomoPhone(e.target.value)}
+                  placeholder="e.g. 024 514 7912"
+                  className="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-sm focus:outline-none focus:ring-2 focus:ring-harmony-900"
+                />
+                <p className="text-[11px] text-stone-400 mt-1">
+                  The Mobile Money phone number our team or dispatch rider should verify with.
+                </p>
+              </div>
+
+              {/* Official Store MoMo Account Details */}
+              <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 text-xs text-stone-700 space-y-2">
+                <div className="flex items-center gap-2 font-bold text-stone-900">
+                  <Smartphone className="w-4 h-4 text-harmony-900" />
+                  <span>Harmony Haven Official MoMo Account</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] pt-1 border-t border-stone-200/60">
+                  <div>
+                    <span className="text-stone-400 block">MoMo Number:</span>
+                    <span className="font-bold font-mono text-stone-900 text-xs">024 514 7912</span>
+                  </div>
+                  <div>
+                    <span className="text-stone-400 block">Account Name:</span>
+                    <span className="font-bold text-stone-900">Harmony Haven Enterprise</span>
+                  </div>
+                </div>
+                <p className="text-[11px] text-stone-500 pt-1">
+                  {paymentTiming === 'PAY_ON_DELIVERY'
+                    ? 'Upon delivery, you will transfer your order total directly to this merchant number or the rider.'
+                    : 'You may complete your MoMo payment using this merchant number upon order placement.'}
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -448,7 +597,7 @@ export default function CheckoutPage() {
                     <div>
                       <p className="font-bold text-stone-900 line-clamp-1">{item.name}</p>
                       <p className="text-stone-400 text-[11px]">
-                        Qty: {item.quantity} {item.variantName && `&bull; ${item.variantName}`}
+                        Qty: {item.quantity} {item.variantName && `• ${item.variantName}`}
                       </p>
                     </div>
                   </div>
@@ -475,6 +624,14 @@ export default function CheckoutPage() {
                   {formatCurrency(finalTotal)}
                 </span>
               </div>
+
+              {/* Payment Arrangement Summary Badge */}
+              <div className="p-2.5 rounded-xl bg-stone-100 flex items-center justify-between text-[11px] font-semibold text-stone-700 mt-2">
+                <span>Payment Arrangement:</span>
+                <span className="font-bold text-harmony-950">
+                  {paymentTiming === 'PAY_ON_DELIVERY' ? 'Payment on Delivery (MoMo)' : 'Pay Before Delivery (MoMo)'}
+                </span>
+              </div>
             </div>
 
             {/* CTA Button */}
@@ -484,10 +641,14 @@ export default function CheckoutPage() {
               className="w-full py-4 rounded-2xl bg-harmony-900 hover:bg-harmony-950 text-white font-bold text-xs uppercase tracking-wider shadow-lg hover:shadow-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {isProcessing ? (
-                <span>Securing & Placing Order...</span>
+                <span>Confirming & Placing Order...</span>
               ) : (
                 <>
-                  <span>Pay & Confirm Order</span>
+                  <span>
+                    {paymentTiming === 'PAY_ON_DELIVERY'
+                      ? 'Place Order (Payment on Delivery)'
+                      : 'Place Order (Pay via MoMo)'}
+                  </span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
