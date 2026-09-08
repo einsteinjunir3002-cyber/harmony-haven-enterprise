@@ -8,23 +8,35 @@ import { CustomOrderStudio } from '@/components/heartlines/CustomOrderStudio';
 export const dynamic = 'force-dynamic';
 
 export default async function HeartlinesPage() {
-  const brand = await prisma.brand.findUnique({
-    where: { slug: '4u-heartlines' },
-    include: {
-      categories: {
-        where: { active: true },
-        include: {
-          products: {
-            where: { active: true },
-            include: { brand: true, category: true, variants: true },
+  let brand: any = null;
+  try {
+    brand = await prisma.brand.findUnique({
+      where: { slug: '4u-heartlines' },
+      include: {
+        categories: {
+          where: { active: true },
+          include: {
+            products: {
+              where: { active: true },
+              include: { brand: true, category: true, variants: true },
+            },
           },
+          orderBy: { sortOrder: 'asc' },
         },
-        orderBy: { sortOrder: 'asc' },
       },
-    },
-  });
+    });
+  } catch (err) {
+    console.error('HeartlinesPage DB error:', err);
+  }
 
-  if (!brand) return <div>Brand not found</div>;
+  if (!brand) {
+    brand = {
+      name: '4U HEARTLINES',
+      tagline: 'When Words Fall Short, We Give Them Wings.',
+      description: 'Handcrafted bespoke poems, elegant glee boxes, framed citation candles, and bespoke gifts designed to touch souls and seal unforgettable memories.',
+      categories: [],
+    };
+  }
 
   return (
     <div className="bg-heartlines-50/40 pb-24 space-y-20">

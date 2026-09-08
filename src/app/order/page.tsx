@@ -31,22 +31,32 @@ export default async function OrderCatalogPage({
   if (sort === 'price_desc') orderBy = { price: 'desc' };
   if (sort === 'name_asc') orderBy = { name: 'asc' };
 
-  const [products, brands] = await Promise.all([
-    prisma.product.findMany({
-      where,
-      include: {
-        brand: true,
-        category: true,
-        variants: true,
-      },
-      orderBy,
-    }),
-    prisma.brand.findMany({
-      where: { active: true },
-      include: { categories: { where: { active: true } } },
-      orderBy: { sortOrder: 'asc' },
-    }),
-  ]);
+  let products: any[] = [];
+  let brands: any[] = [];
+  try {
+    const results = await Promise.all([
+      prisma.product.findMany({
+        where,
+        include: {
+          brand: true,
+          category: true,
+          variants: true,
+        },
+        orderBy,
+      }),
+      prisma.brand.findMany({
+        where: { active: true },
+        include: {
+          categories: { where: { active: true }, orderBy: { sortOrder: 'asc' } },
+        },
+        orderBy: { sortOrder: 'asc' },
+      }),
+    ]);
+    products = results[0];
+    brands = results[1];
+  } catch (err) {
+    console.error('OrderCatalogPage DB error:', err);
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">

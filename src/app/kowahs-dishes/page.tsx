@@ -7,27 +7,40 @@ import { ProductCard } from '@/components/ui/ProductCard';
 export const dynamic = 'force-dynamic';
 
 export default async function KowahsDishesPage() {
-  const brand = await prisma.brand.findUnique({
-    where: { slug: 'kowahs-dishes' },
-    include: {
-      categories: {
-        where: { active: true },
-        include: {
-          products: {
-            where: { active: true },
-            include: { brand: true, category: true, variants: true },
+  let brand: any = null;
+  try {
+    brand = await prisma.brand.findUnique({
+      where: { slug: 'kowahs-dishes' },
+      include: {
+        categories: {
+          where: { active: true },
+          include: {
+            products: {
+              where: { active: true },
+              include: { brand: true, category: true, variants: true },
+            },
           },
+          orderBy: { sortOrder: 'asc' },
         },
-        orderBy: { sortOrder: 'asc' },
+        products: {
+          where: { active: true },
+          include: { brand: true, category: true, variants: true },
+        },
       },
-      products: {
-        where: { active: true },
-        include: { brand: true, category: true, variants: true },
-      },
-    },
-  });
+    });
+  } catch (err) {
+    console.error('KowahsDishesPage DB error:', err);
+  }
 
-  if (!brand) return <div>Brand not found</div>;
+  if (!brand) {
+    brand = {
+      name: "Kowah's Dishes",
+      tagline: 'Flavour in Every Bite. Prepared with Passion.',
+      description: 'Crafted culinary perfection bringing rich Ghanaian flavors and warmth to your table.',
+      categories: [],
+      products: [],
+    };
+  }
 
   return (
     <div className="bg-kowah-50/50 pb-24 space-y-20">

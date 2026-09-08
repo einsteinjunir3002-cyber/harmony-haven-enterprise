@@ -21,30 +21,43 @@ import { BUSINESS_INFO } from '@/lib/constants';
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  const [brands, featuredProducts, contentBlocks, galleryMedia] = await Promise.all([
-    prisma.brand.findMany({
-      where: { active: true },
-      include: {
-        categories: { where: { active: true }, take: 4 },
-      },
-      orderBy: { sortOrder: 'asc' },
-    }),
-    prisma.product.findMany({
-      where: { active: true, featured: true },
-      take: 6,
-      include: {
-        brand: true,
-        category: true,
-        variants: true,
-      },
-      orderBy: { sortOrder: 'asc' },
-    }),
-    prisma.contentBlock.findMany(),
-    prisma.media.findMany({
-      where: { category: { in: ['GALLERY', 'PRODUCT'] } },
-      take: 8,
-    }),
-  ]);
+  let brands: any[] = [];
+  let featuredProducts: any[] = [];
+  let contentBlocks: any[] = [];
+  let galleryMedia: any[] = [];
+
+  try {
+    const results = await Promise.all([
+      prisma.brand.findMany({
+        where: { active: true },
+        include: {
+          categories: { where: { active: true }, take: 4 },
+        },
+        orderBy: { sortOrder: 'asc' },
+      }),
+      prisma.product.findMany({
+        where: { active: true, featured: true },
+        take: 6,
+        include: {
+          brand: true,
+          category: true,
+          variants: true,
+        },
+        orderBy: { sortOrder: 'asc' },
+      }),
+      prisma.contentBlock.findMany(),
+      prisma.media.findMany({
+        where: { category: { in: ['GALLERY', 'PRODUCT'] } },
+        take: 8,
+      }),
+    ]);
+    brands = results[0];
+    featuredProducts = results[1];
+    contentBlocks = results[2];
+    galleryMedia = results[3];
+  } catch (err) {
+    console.error('HomePage DB error, using fallback:', err);
+  }
 
   // Helper to parse content blocks
   const getBlock = (key: string, defaultVal: any) => {

@@ -7,7 +7,12 @@ import { BUSINESS_INFO } from '@/lib/constants';
 export const dynamic = 'force-dynamic';
 
 export default async function AboutPage() {
-  const contentBlocks = await prisma.contentBlock.findMany();
+  let contentBlocks: any[] = [];
+  try {
+    contentBlocks = await prisma.contentBlock.findMany();
+  } catch (err) {
+    console.error('AboutPage DB error, using default content:', err);
+  }
 
   const getBlock = (key: string, defaultVal: any) => {
     const found = contentBlocks.find((b) => b.key === key);
