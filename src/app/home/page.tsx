@@ -489,7 +489,7 @@ export default async function FullHomePage() {
               Delicious Food & Thoughtful Gifts Delivered to Your Door
             </h3>
             <p className="text-stone-300 text-sm">
-              We deliver across Accra, Tema, Kumasi, and nationwide across Ghana.
+              We deliver across Kumasi, Cape Coast, and Accra (24hr to 48hrs).
             </p>
           </div>
 

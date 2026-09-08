@@ -140,7 +140,7 @@ export function CartDrawer() {
               <div className="flex items-center justify-between text-xs text-stone-500">
                 <span className="flex items-center gap-1.5">
                   <Truck className="w-3.5 h-3.5 text-harmony-800" />
-                  Estimated Delivery in Ghana (24 - 48 hrs)
+                  Estimated Delivery to Kumasi, Cape Coast & Accra (24hr to 48hrs)
                 </span>
                 <span>Calculated at checkout</span>
               </div>

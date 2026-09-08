@@ -25,16 +25,11 @@ async function main() {
   });
   console.log(`Created Super Admin user: ${adminUser.name} (${adminUser.email})`);
 
-  // 2. Create Delivery Zones across Ghana
+  // 2. Create Delivery Zones (Kumasi, Cape Coast, Accra)
   const deliveryZones = [
-    { name: "Accra Central & Ring Road", region: "Greater Accra", fee: 25.0, estimatedTime: "24 - 48 hrs" },
-    { name: "East Legon, Airport, Dzorwulu", region: "Greater Accra", fee: 30.0, estimatedTime: "24 - 48 hrs" },
-    { name: "Tema, Spintex & Sakumono", region: "Greater Accra", fee: 35.0, estimatedTime: "24 - 48 hrs" },
-    { name: "Madina, Adenta & Haatso", region: "Greater Accra", fee: 35.0, estimatedTime: "24 - 48 hrs" },
-    { name: "Dansoman, Weija & Kasoa", region: "Greater Accra", fee: 40.0, estimatedTime: "24 - 48 hrs" },
-    { name: "Kumasi Metropolis", region: "Ashanti", fee: 50.0, estimatedTime: "24 - 48 hrs" },
-    { name: "Takoradi / Cape Coast", region: "Western / Central", fee: 55.0, estimatedTime: "24 - 48 hrs" },
-    { name: "Nationwide Express Courier", region: "All Regions", fee: 65.0, estimatedTime: "24 - 48 hrs" },
+    { name: "Accra", region: "Greater Accra", fee: 25.0, estimatedTime: "24 - 48 hrs" },
+    { name: "Kumasi", region: "Ashanti", fee: 40.0, estimatedTime: "24 - 48 hrs" },
+    { name: "Cape Coast", region: "Central", fee: 35.0, estimatedTime: "24 - 48 hrs" },
   ];
 
   for (const zone of deliveryZones) {

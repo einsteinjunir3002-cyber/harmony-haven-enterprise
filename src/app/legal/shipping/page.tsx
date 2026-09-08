@@ -13,14 +13,14 @@ export default function ShippingPolicyPage() {
         <section className="space-y-2">
           <h2 className="font-serif font-bold text-base text-stone-900">1. Coverage Areas in Ghana</h2>
           <p>
-            We deliver across Greater Accra, Tema, Spintex, Kumasi, Takoradi, Cape Coast, and nationwide across all 16 regions of Ghana via verified express courier services.
+            We deliver to <strong>Kumasi</strong>, <strong>Cape Coast</strong>, and <strong>Accra</strong> via verified express courier services.
           </p>
         </section>
 
         <section className="space-y-2">
           <h2 className="font-serif font-bold text-base text-stone-900">2. Delivery Time</h2>
           <p>
-            Our general delivery duration is <strong>24 to 48 hours</strong> across all delivery zones in Ghana.
+            Our general delivery duration is <strong>24hr to 48hrs</strong> across Kumasi, Cape Coast, and Accra.
             Once your order is confirmed, our team prepares your items fresh and dispatches them straight to your doorstep or designated pickup point within 24 to 48 hours.
           </p>
         </section>

@@ -10,29 +10,22 @@ export const BUSINESS_INFO = {
   email: "successlight@gmail.com",
   instagram: "harmony_haven.enterprise",
   instagramUrl: "https://instagram.com/harmony_haven.enterprise",
-  location: "Operating in Ghana | Delivery available depending on order/location",
+  location: "Operating in Ghana | Deliveries to Kumasi, Cape Coast & Accra (24hr to 48hrs)",
   currency: "GHS",
   currencySymbol: "GH₵",
 };
+
+export const DELIVERY_LOCATIONS = [
+  "Kumasi",
+  "Cape Coast",
+  "Accra",
+] as const;
 
 export const GHANA_REGIONS = [
   "Greater Accra",
   "Ashanti",
   "Central",
-  "Eastern",
-  "Western",
-  "Western North",
-  "Volta",
-  "Oti",
-  "Northern",
-  "North East",
-  "Savannah",
-  "Upper East",
-  "Upper West",
-  "Bono",
-  "Bono East",
-  "Ahafo",
-];
+] as const;
 
 export const ORDER_STATUS_FLOW = [
   { key: "NEW", label: "New Order", color: "bg-blue-100 text-blue-800" },

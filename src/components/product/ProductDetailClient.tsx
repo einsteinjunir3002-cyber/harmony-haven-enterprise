@@ -262,7 +262,7 @@ export function ProductDetailClient({ product }: ProductDetailProps) {
         <div className="pt-4 border-t border-stone-100 space-y-2 text-xs text-stone-500">
           <div className="flex items-center gap-2">
             <Truck className="w-4 h-4 text-harmony-900" />
-            <span>Delivery available across Ghana (General delivery duration: 24hr to 48hrs).</span>
+            <span>Delivery available to Kumasi, Cape Coast & Accra (24hr to 48hrs).</span>
           </div>
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-600" />

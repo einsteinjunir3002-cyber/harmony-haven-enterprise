@@ -38,7 +38,7 @@ export default function AdminSettingsPage() {
   const [whatsappPhone, setWhatsappPhone] = useState('024 514 7912');
   const [supportPhone, setSupportPhone] = useState('024 514 7912');
   const [supportEmail, setSupportEmail] = useState('successlight@gmail.com');
-  const [storeAddress, setStoreAddress] = useState('Accra, Ghana (Nationwide Express Delivery)');
+  const [storeAddress, setStoreAddress] = useState('Accra, Ghana (Deliveries to Kumasi, Cape Coast & Accra)');
 
   // Store Announcement Banner
   const [bannerEnabled, setBannerEnabled] = useState(true);

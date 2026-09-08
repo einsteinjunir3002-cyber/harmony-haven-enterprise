@@ -334,7 +334,7 @@ export default function CheckoutPage() {
                       required={deliveryMethod === 'DELIVERY'}
                       value={formData.city}
                       onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                      placeholder="e.g. Accra, Tema, Kumasi"
+                      placeholder="e.g. Kumasi, Cape Coast, or Accra"
                       className="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-sm focus:outline-none focus:ring-2 focus:ring-harmony-900"
                     />
                   </div>
