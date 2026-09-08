@@ -165,16 +165,7 @@ export function Navbar() {
             {/* Theme Toggle Icon */}
             <ThemeToggle />
 
-            {/* Admin Dashboard Badge */}
-            {user && (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN' || user.role === 'STAFF') && (
-              <Link
-                href="/admin/dashboard"
-                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 text-xs font-semibold rounded-full border border-amber-300 dark:border-amber-700 hover:bg-amber-100 transition-colors"
-              >
-                <Shield className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
-                <span>Admin Hub</span>
-              </Link>
-            )}
+
 
             {/* Customer Account Button */}
             <Link
@@ -278,16 +269,7 @@ export function Navbar() {
               <span>Contact Us</span>
             </Link>
 
-            {user && (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN' || user.role === 'STAFF') && (
-              <Link
-                href="/admin/dashboard"
-                onClick={() => setMobileMenuOpen(false)}
-                className="py-2 text-amber-800 border-b border-stone-100 flex items-center gap-2 font-semibold"
-              >
-                <Shield className="w-4 h-4" />
-                <span>Admin Dashboard</span>
-              </Link>
-            )}
+
 
             <Link
               href={user ? '/account' : '/account/login'}

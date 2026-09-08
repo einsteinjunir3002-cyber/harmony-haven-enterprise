@@ -219,7 +219,7 @@ model DeliveryZone {
   name          String   // e.g. "Accra Central", "Tema / Spintex", "East Legon / Madina", "Kumasi Metro"
   region        String   // "Greater Accra", "Ashanti", etc.
   fee           Float
-  estimatedTime String   @default("Same Day / Next Day")
+  estimatedTime String   @default("24 - 48 hrs")
   active        Boolean  @default(true)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

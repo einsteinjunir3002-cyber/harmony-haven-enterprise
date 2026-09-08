@@ -81,7 +81,7 @@ export async function PUT(request: Request) {
               name: newZone.name.trim(),
               region: newZone.region ? newZone.region.trim() : 'Greater Accra',
               fee: parseFloat(newZone.fee),
-              estimatedTime: newZone.estimatedTime || 'Same Day (2-4 hrs)',
+              estimatedTime: newZone.estimatedTime || '24 - 48 hrs',
               active: true,
             },
           });

@@ -50,7 +50,7 @@ export default function AccountPage() {
             <div className="flex items-center gap-2">
               <h1 className="font-serif font-bold text-2xl text-stone-950">{user.name}</h1>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-stone-100 text-stone-700">
-                {user.role}
+                Verified Member
               </span>
             </div>
             <p className="text-xs text-stone-500 mt-0.5">{user.email} &bull; {user.phone || 'No phone saved'}</p>
@@ -58,15 +58,6 @@ export default function AccountPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          {(user.role === 'ADMIN' || user.role === 'SUPER_ADMIN' || user.role === 'STAFF') && (
-            <Link
-              href="/admin/dashboard"
-              className="px-5 py-2.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-950 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 transition-colors"
-            >
-              <Shield className="w-4 h-4 text-amber-800" />
-              <span>Admin Hub</span>
-            </Link>
-          )}
 
           <button
             onClick={() => logout()}

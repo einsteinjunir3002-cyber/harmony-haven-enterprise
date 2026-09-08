@@ -54,7 +54,7 @@ export default function AdminSettingsPage() {
   const [newZoneName, setNewZoneName] = useState('');
   const [newZoneRegion, setNewZoneRegion] = useState('Greater Accra');
   const [newZoneFee, setNewZoneFee] = useState(30);
-  const [newZoneTime, setNewZoneTime] = useState('Same Day (2-4 hrs)');
+  const [newZoneTime, setNewZoneTime] = useState('24 - 48 hrs');
 
   const fetchSettings = async () => {
     try {

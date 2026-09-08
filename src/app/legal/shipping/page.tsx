@@ -18,11 +18,10 @@ export default function ShippingPolicyPage() {
         </section>
 
         <section className="space-y-2">
-          <h2 className="font-serif font-bold text-base text-stone-900">2. Dispatch Timelines</h2>
+          <h2 className="font-serif font-bold text-base text-stone-900">2. Delivery Time</h2>
           <p>
-            - Greater Accra & Tema: Same day or scheduled preferred delivery date.<br />
-            - Regional Hubs (Kumasi, Takoradi, etc.): Next day express dispatch.<br />
-            - Nationwide Courier: 24 to 48 hours.
+            Our general delivery duration is <strong>24 to 48 hours</strong> across all delivery zones in Ghana.
+            Once your order is confirmed, our team prepares your items fresh and dispatches them straight to your doorstep or designated pickup point within 24 to 48 hours.
           </p>
         </section>
       </div>
