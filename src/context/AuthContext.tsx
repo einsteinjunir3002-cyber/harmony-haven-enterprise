@@ -15,7 +15,6 @@ interface AuthContextType {
   user: UserProfile | null;
   isLoading: boolean;
   login: (emailOrName: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  adminQuickLogin: () => Promise<{ success: boolean; error?: string }>;
   register: (name: string, email: string, password: string, phone?: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -66,22 +65,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const adminQuickLogin = async () => {
-    try {
-      const res = await fetch('/api/auth/admin-quick-login', {
-        method: 'POST',
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        return { success: false, error: data.error || 'Admin login failed' };
-      }
-      setUser(data.user);
-      return { success: true };
-    } catch (e: any) {
-      return { success: false, error: e.message || 'Network error' };
-    }
-  };
-
   const register = async (name: string, email: string, password: string, phone?: string) => {
     try {
       const res = await fetch('/api/auth/register', {
@@ -103,11 +86,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
+    } catch {
+      // ignore
+    } finally {
       setUser(null);
       router.push('/');
       router.refresh();
-    } catch (e) {
-      console.error('Logout error', e);
     }
   };
 
@@ -117,7 +101,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         isLoading,
         login,
-        adminQuickLogin,
         register,
         logout,
         refreshUser,

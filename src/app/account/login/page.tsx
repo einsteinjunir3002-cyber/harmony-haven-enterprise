@@ -8,7 +8,7 @@ import { useAuth } from '@/context/AuthContext';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, adminQuickLogin, register, user } = useAuth();
+  const { login, register, user } = useAuth();
 
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [emailOrName, setEmailOrName] = useState('');
@@ -19,7 +19,6 @@ export default function LoginPage() {
   const [regPassword, setRegPassword] = useState('');
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isAdminQuickLoading, setIsAdminQuickLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
   if (user) {
@@ -60,20 +59,6 @@ export default function LoginPage() {
     }
   };
 
-  const handleAdminQuickLogin = async () => {
-    setErrorMsg('');
-    setIsAdminQuickLoading(true);
-
-    const res = await adminQuickLogin();
-    setIsAdminQuickLoading(false);
-
-    if (!res.success) {
-      setErrorMsg(res.error || 'Admin quick login failed');
-    } else {
-      router.push('/admin/dashboard');
-    }
-  };
-
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-16 bg-stone-50/60">
       <div className="w-full max-w-md space-y-8">
@@ -88,26 +73,6 @@ export default function LoginPage() {
           <p className="text-xs text-stone-500 uppercase tracking-wider">
             {mode === 'login' ? 'Sign In to Your Account' : 'Create a Customer Account'}
           </p>
-        </div>
-
-        {/* Highlighted Owner / Admin Quick Login Feature */}
-        <div className="p-4 rounded-2xl bg-amber-50/90 border border-amber-200/80 shadow-xs space-y-3">
-          <div className="flex items-center gap-2 text-amber-900">
-            <Shield className="w-4 h-4 text-amber-700" />
-            <span className="font-serif font-bold text-xs">Owner & Staff Direct Access</span>
-          </div>
-          <p className="text-[11px] text-amber-800 leading-relaxed font-light">
-            Authorized admin credentials: <span className="font-semibold font-mono">Alberta Glory</span> / password: <span className="font-semibold font-mono">1234567890</span>.
-          </p>
-          <button
-            type="button"
-            onClick={handleAdminQuickLogin}
-            disabled={isAdminQuickLoading}
-            className="w-full py-2.5 px-4 rounded-xl bg-amber-800 hover:bg-amber-900 text-gold-100 font-bold text-xs uppercase tracking-wider shadow-sm transition-all flex items-center justify-center gap-2"
-          >
-            <Shield className="w-3.5 h-3.5" />
-            <span>{isAdminQuickLoading ? 'Logging In as Admin...' : 'Continue as Admin (Alberta Glory)'}</span>
-          </button>
         </div>
 
         {/* Main Card */}
@@ -154,7 +119,7 @@ export default function LoginPage() {
                     required
                     value={emailOrName}
                     onChange={(e) => setEmailOrName(e.target.value)}
-                    placeholder="e.g. Alberta Glory or email"
+                    placeholder="Enter your email or username"
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-300 text-sm focus:outline-none focus:ring-2 focus:ring-harmony-900"
                   />
                 </div>
