@@ -15,6 +15,7 @@ import {
   AlertCircle,
   RefreshCw,
   ShoppingBag,
+  Smartphone,
 } from 'lucide-react';
 import { formatCurrency, formatDate, ORDER_STATUS_FLOW } from '@/lib/utils';
 import { BUSINESS_INFO } from '@/lib/constants';
@@ -238,6 +239,40 @@ export default function OrderConfirmationPage({
           </Link>
         </div>
       </div>
+
+      {/* Prominent Payment Arrangement Notice */}
+      {isPayOnDelivery ? (
+        <div className="bg-emerald-50 border-2 border-emerald-300 rounded-3xl p-6 sm:p-8 space-y-2 text-emerald-950 shadow-xs">
+          <div className="flex items-center gap-2.5 font-bold text-base text-emerald-950">
+            <CheckCircle2 className="w-5 h-5 text-emerald-700 shrink-0" />
+            <span>Payment on Delivery Confirmed — No Online Charge Made</span>
+          </div>
+          <p className="text-xs sm:text-sm text-emerald-900 leading-relaxed">
+            Your order has been sent to our kitchen team and is being prepared! <strong>No MoMo prompt was sent to your phone</strong> because you selected <strong>Payment on Delivery</strong>. Please prepare <strong>{formatCurrency(order.total)}</strong> to pay our delivery rider (via MoMo or cash) upon arrival.
+          </p>
+        </div>
+      ) : (
+        <div className="bg-amber-50 border-2 border-amber-300 rounded-3xl p-6 sm:p-8 space-y-3 text-amber-950 shadow-xs">
+          <div className="flex items-center gap-2.5 font-bold text-base text-amber-950">
+            <Smartphone className="w-5 h-5 text-amber-700 shrink-0" />
+            <span>Pay Before Delivery — MoMo Transfer Details</span>
+          </div>
+          <p className="text-xs sm:text-sm text-amber-900 leading-relaxed">
+            Please transfer <strong>{formatCurrency(order.total)}</strong> to complete payment for priority dispatch:
+          </p>
+          <div className="p-4 bg-white rounded-2xl border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            <div>
+              <span className="text-stone-400 block text-[10px] uppercase tracking-wider font-bold">Official MoMo Number:</span>
+              <span className="text-stone-900 font-mono font-bold text-base">024 514 7912</span>
+              <span className="text-stone-500 block text-[11px]">(Harmony Haven Enterprise / Alberta Glory)</span>
+            </div>
+            <div>
+              <span className="text-stone-400 block text-[10px] uppercase tracking-wider font-bold">Payment Reference:</span>
+              <span className="text-harmony-950 font-mono font-bold text-base">{order.orderNumber}</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Live Order Status Stepper */}
       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-stone-200 shadow-xs space-y-6">

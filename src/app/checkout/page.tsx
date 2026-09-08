@@ -504,6 +504,29 @@ export default function CheckoutPage() {
                   </p>
                 </button>
               </div>
+
+              {/* Instant Clarification Box on Selected Timing */}
+              {paymentTiming === 'PAY_ON_DELIVERY' ? (
+                <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-950 space-y-1.5 animate-fadeIn">
+                  <div className="flex items-center gap-2 font-bold text-emerald-900">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
+                    <span>Payment on Delivery Selected — No Online MoMo Prompt</span>
+                  </div>
+                  <p className="leading-relaxed text-emerald-800">
+                    <strong>Notice:</strong> No payment prompt will be sent to your phone right now. Your order is confirmed immediately so the kitchen can prepare it. You will pay <strong>{formatCurrency(finalTotal)}</strong> to the dispatch rider (via MoMo or cash) when your order reaches your doorstep.
+                  </p>
+                </div>
+              ) : (
+                <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-950 space-y-1.5 animate-fadeIn">
+                  <div className="flex items-center gap-2 font-bold text-amber-900">
+                    <Smartphone className="w-4 h-4 text-amber-700 shrink-0" />
+                    <span>Pay Before Delivery Selected</span>
+                  </div>
+                  <p className="leading-relaxed text-amber-800">
+                    Your order will be prepared and prioritized once your Mobile Money payment of <strong>{formatCurrency(finalTotal)}</strong> is confirmed. You can transfer directly to our merchant number (<strong>024 514 7912</strong>) using your order number as reference.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Strict MoMo Network Selector */}
@@ -644,15 +667,21 @@ export default function CheckoutPage() {
                 <span>Confirming & Placing Order...</span>
               ) : (
                 <>
-                  <span>
+                  <span className="text-center">
                     {paymentTiming === 'PAY_ON_DELIVERY'
-                      ? 'Place Order (Payment on Delivery)'
-                      : 'Place Order (Pay via MoMo)'}
+                      ? `Confirm Order (Pay ${formatCurrency(finalTotal)} on Delivery)`
+                      : `Place Order & Pay via MoMo (${formatCurrency(finalTotal)})`}
                   </span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
+
+            {paymentTiming === 'PAY_ON_DELIVERY' && (
+              <p className="text-[11px] text-center text-emerald-800 font-medium">
+                ✨ No money deducted now &bull; You will pay the rider upon delivery
+              </p>
+            )}
 
             <div className="text-center pt-2">
               <span className="text-[11px] text-stone-400 flex items-center justify-center gap-1.5">
