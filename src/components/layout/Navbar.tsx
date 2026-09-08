@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { ShoppingBag, User, Menu, X, Shield, ChevronDown, Sparkles, Utensils, Heart } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 export function Navbar() {
   const pathname = usePathname();
@@ -22,7 +23,7 @@ export function Navbar() {
   if (isAdmin) return null;
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-stone-200/80 shadow-xs transition-colors">
+    <header className="sticky top-0 z-40 w-full bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-b border-stone-200/80 dark:border-stone-800 shadow-xs transition-colors">
       {/* Top corporate notice bar */}
       <div className="bg-harmony-900 text-gold-200 text-xs py-1.5 px-4 text-center font-medium tracking-wide flex items-center justify-center gap-2">
         <Sparkles className="w-3.5 h-3.5 text-gold-400" />
@@ -48,11 +49,11 @@ export function Navbar() {
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-8 text-sm font-medium text-stone-700">
+          <nav className="hidden lg:flex items-center gap-8 text-sm font-medium text-stone-700 dark:text-stone-300">
             <Link
               href="/home"
-              className={`hover:text-harmony-900 transition-colors ${
-                pathname === '/home' ? 'text-harmony-900 font-semibold' : ''
+              className={`hover:text-harmony-900 dark:hover:text-gold-400 transition-colors ${
+                pathname === '/home' ? 'text-harmony-900 dark:text-gold-400 font-semibold' : ''
               }`}
             >
               HOME
@@ -60,8 +61,8 @@ export function Navbar() {
 
             <Link
               href="/about"
-              className={`hover:text-harmony-900 transition-colors ${
-                pathname === '/about' ? 'text-harmony-900 font-semibold' : ''
+              className={`hover:text-harmony-900 dark:hover:text-gold-400 transition-colors ${
+                pathname === '/about' ? 'text-harmony-900 dark:text-gold-400 font-semibold' : ''
               }`}
             >
               ABOUT
@@ -72,9 +73,9 @@ export function Navbar() {
               <button
                 onClick={() => setBrandsDropdownOpen(!brandsDropdownOpen)}
                 onMouseEnter={() => setBrandsDropdownOpen(true)}
-                className={`flex items-center gap-1.5 hover:text-harmony-900 transition-colors py-2 ${
+                className={`flex items-center gap-1.5 hover:text-harmony-900 dark:hover:text-gold-400 transition-colors py-2 ${
                   pathname.startsWith('/brands') || isKowah || isHeartlines
-                    ? 'text-harmony-900 font-semibold'
+                    ? 'text-harmony-900 dark:text-gold-400 font-semibold'
                     : ''
                 }`}
               >
@@ -84,39 +85,39 @@ export function Navbar() {
 
               <div
                 onMouseLeave={() => setBrandsDropdownOpen(false)}
-                className={`absolute left-0 top-full mt-1 w-64 bg-white rounded-xl shadow-xl border border-stone-200 p-2 transition-all duration-200 ${
+                className={`absolute left-0 top-full mt-1 w-64 bg-white dark:bg-stone-900 rounded-xl shadow-xl border border-stone-200 dark:border-stone-800 p-2 transition-all duration-200 ${
                   brandsDropdownOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'
                 }`}
               >
                 <Link
                   href="/kowahs-dishes"
                   onClick={() => setBrandsDropdownOpen(false)}
-                  className="flex items-start gap-3 p-3 rounded-lg hover:bg-kowah-50 transition-colors group"
+                  className="flex items-start gap-3 p-3 rounded-lg hover:bg-kowah-50 dark:hover:bg-stone-800 transition-colors group"
                 >
                   <div className="w-9 h-9 rounded-lg bg-kowah-900 text-gold-400 flex items-center justify-center shrink-0">
                     <Utensils className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="font-semibold text-stone-900 text-sm group-hover:text-kowah-900">
+                    <p className="font-semibold text-stone-900 dark:text-stone-100 text-sm group-hover:text-kowah-900">
                       Kowah&apos;s Dishes
                     </p>
-                    <p className="text-xs text-stone-500">Cook Less, Live More!</p>
+                    <p className="text-xs text-stone-500 dark:text-stone-400">Cook Less, Live More!</p>
                   </div>
                 </Link>
 
                 <Link
                   href="/4u-heartlines"
                   onClick={() => setBrandsDropdownOpen(false)}
-                  className="flex items-start gap-3 p-3 rounded-lg hover:bg-heartlines-50 transition-colors group mt-1"
+                  className="flex items-start gap-3 p-3 rounded-lg hover:bg-heartlines-50 dark:hover:bg-stone-800 transition-colors group mt-1"
                 >
                   <div className="w-9 h-9 rounded-lg bg-harmony-900 text-gold-400 flex items-center justify-center shrink-0">
                     <Heart className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="font-semibold text-stone-900 text-sm group-hover:text-harmony-900">
+                    <p className="font-semibold text-stone-900 dark:text-stone-100 text-sm group-hover:text-harmony-900">
                       4U HEARTLINES
                     </p>
-                    <p className="text-xs text-stone-500">Where feelings find words</p>
+                    <p className="text-xs text-stone-500 dark:text-stone-400">Where feelings find words</p>
                   </div>
                 </Link>
               </div>
@@ -124,8 +125,8 @@ export function Navbar() {
 
             <Link
               href="/kowahs-dishes"
-              className={`hover:text-kowah-900 transition-colors ${
-                isKowah ? 'text-kowah-900 font-semibold' : ''
+              className={`hover:text-kowah-900 dark:hover:text-kowah-400 transition-colors ${
+                isKowah ? 'text-kowah-900 dark:text-kowah-400 font-semibold' : ''
               }`}
             >
               KOWAH&apos;S DISHES
@@ -133,8 +134,8 @@ export function Navbar() {
 
             <Link
               href="/4u-heartlines"
-              className={`hover:text-heartlines-900 transition-colors ${
-                isHeartlines ? 'text-heartlines-900 font-semibold' : ''
+              className={`hover:text-heartlines-900 dark:hover:text-teal-400 transition-colors ${
+                isHeartlines ? 'text-heartlines-900 dark:text-teal-400 font-semibold' : ''
               }`}
             >
               4U HEARTLINES
@@ -142,8 +143,8 @@ export function Navbar() {
 
             <Link
               href="/order"
-              className={`hover:text-harmony-900 transition-colors ${
-                pathname === '/order' ? 'text-harmony-900 font-semibold' : ''
+              className={`hover:text-harmony-900 dark:hover:text-gold-400 transition-colors ${
+                pathname === '/order' ? 'text-harmony-900 dark:text-gold-400 font-semibold' : ''
               }`}
             >
               ALL PRODUCTS
@@ -151,8 +152,8 @@ export function Navbar() {
 
             <Link
               href="/contact"
-              className={`hover:text-harmony-900 transition-colors ${
-                pathname === '/contact' ? 'text-harmony-900 font-semibold' : ''
+              className={`hover:text-harmony-900 dark:hover:text-gold-400 transition-colors ${
+                pathname === '/contact' ? 'text-harmony-900 dark:text-gold-400 font-semibold' : ''
               }`}
             >
               CONTACT
@@ -160,14 +161,17 @@ export function Navbar() {
           </nav>
 
           {/* Right Action Buttons */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            {/* Theme Toggle Icon */}
+            <ThemeToggle />
+
             {/* Admin Dashboard Badge */}
             {user && (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN' || user.role === 'STAFF') && (
               <Link
                 href="/admin/dashboard"
-                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-900 text-xs font-semibold rounded-full border border-amber-300 hover:bg-amber-100 transition-colors"
+                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 text-xs font-semibold rounded-full border border-amber-300 dark:border-amber-700 hover:bg-amber-100 transition-colors"
               >
-                <Shield className="w-3.5 h-3.5 text-amber-700" />
+                <Shield className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
                 <span>Admin Hub</span>
               </Link>
             )}
@@ -175,7 +179,7 @@ export function Navbar() {
             {/* Customer Account Button */}
             <Link
               href={user ? '/account' : '/account/login'}
-              className="p-2 text-stone-700 hover:text-harmony-900 hover:bg-stone-100 rounded-full transition-colors flex items-center gap-1.5"
+              className="p-2 text-stone-700 dark:text-stone-300 hover:text-harmony-900 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800 rounded-full transition-colors flex items-center gap-1.5"
               title={user ? `Signed in as ${user.name}` : 'Sign In'}
             >
               <User className="w-5 h-5" />
@@ -185,7 +189,7 @@ export function Navbar() {
             {/* Cart Button */}
             <button
               onClick={() => setIsOpen(true)}
-              className="relative p-2.5 bg-stone-100 hover:bg-stone-200 text-harmony-950 rounded-full transition-colors"
+              className="relative p-2.5 bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-harmony-950 dark:text-stone-100 rounded-full transition-colors"
               aria-label="View Shopping Cart"
             >
               <ShoppingBag className="w-5 h-5" />
@@ -207,7 +211,7 @@ export function Navbar() {
             {/* Mobile Menu Hamburger */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 text-stone-700 hover:text-harmony-900 rounded-lg"
+              className="lg:hidden p-2 text-stone-700 dark:text-stone-300 hover:text-harmony-900 rounded-lg"
               aria-label="Toggle Navigation Menu"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -218,8 +222,12 @@ export function Navbar() {
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-white border-b border-stone-200 px-6 py-6 shadow-xl space-y-4">
-          <nav className="flex flex-col gap-3 text-base font-medium text-stone-800">
+        <div className="lg:hidden bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 px-6 py-6 shadow-xl space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-stone-100 dark:border-stone-800">
+            <span className="text-xs font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">Theme</span>
+            <ThemeToggle />
+          </div>
+          <nav className="flex flex-col gap-3 text-base font-medium text-stone-800 dark:text-stone-200">
             <Link
               href="/home"
               onClick={() => setMobileMenuOpen(false)}

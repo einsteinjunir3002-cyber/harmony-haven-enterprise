@@ -8,12 +8,23 @@
   --background-end-rgb: 255, 255, 255;
 }
 
+html.dark {
+  --foreground-rgb: 243, 244, 246;
+  --background-start-rgb: 12, 16, 23;
+  --background-end-rgb: 15, 23, 42;
+}
+
 @layer base {
   body {
     color: rgb(var(--foreground-rgb));
     background: #fdfbf7;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     overflow-x: hidden;
+  }
+
+  html.dark body {
+    background: #090d13;
+    color: #f3f4f6;
   }
 
   h1, h2, h3, h4, .font-serif {
@@ -46,6 +57,13 @@
   border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
+html.dark .glass-panel {
+  background: rgba(18, 24, 38, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 .glass-dark {
   background: rgba(10, 77, 82, 0.85);
   backdrop-filter: blur(12px);
@@ -60,6 +78,9 @@
 }
 ::-webkit-scrollbar-track {
   background: #f1f1f1;
+}
+html.dark ::-webkit-scrollbar-track {
+  background: #111827;
 }
 ::-webkit-scrollbar-thumb {
   background: #c59b27;
