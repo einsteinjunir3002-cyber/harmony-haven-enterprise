@@ -241,13 +241,22 @@ export default function LoginPage() {
           </div>
 
           {/* Continue as Guest Button */}
-          <Link
-            href="/order"
-            className="w-full py-3.5 rounded-xl border border-stone-300 hover:border-harmony-800 hover:bg-stone-50 text-stone-700 hover:text-harmony-950 font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-xs"
-          >
-            <span>Continue as Guest</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
+          <div className="space-y-2.5">
+            <Link
+              href="/home"
+              className="w-full py-3.5 rounded-xl border-2 border-stone-300 hover:border-harmony-800 hover:bg-stone-50 text-stone-800 hover:text-harmony-950 font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-xs"
+            >
+              <span>Continue as Guest</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+
+            <Link
+              href="/order"
+              className="w-full py-2.5 text-center text-xs font-semibold text-stone-500 hover:text-harmony-900 block transition-colors"
+            >
+              Jump directly to Order Catalog →
+            </Link>
+          </div>
         </div>
       </div>
     </div>

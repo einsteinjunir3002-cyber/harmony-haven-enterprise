@@ -33,7 +33,7 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo & Brand Identity */}
-          <Link href="/" className="flex items-center gap-3 group">
+          <Link href="/home" className="flex items-center gap-3 group">
             <div className="w-11 h-11 rounded-full bg-gradient-to-br from-harmony-800 to-harmony-950 flex items-center justify-center text-gold-400 font-serif font-bold text-xl shadow-md border border-gold-400/30 group-hover:scale-105 transition-transform">
               H
             </div>
@@ -50,9 +50,9 @@ export function Navbar() {
           {/* Desktop Navigation Links */}
           <nav className="hidden lg:flex items-center gap-8 text-sm font-medium text-stone-700">
             <Link
-              href="/"
+              href="/home"
               className={`hover:text-harmony-900 transition-colors ${
-                pathname === '/' ? 'text-harmony-900 font-semibold' : ''
+                pathname === '/home' ? 'text-harmony-900 font-semibold' : ''
               }`}
             >
               HOME
@@ -221,7 +221,7 @@ export function Navbar() {
         <div className="lg:hidden bg-white border-b border-stone-200 px-6 py-6 shadow-xl space-y-4">
           <nav className="flex flex-col gap-3 text-base font-medium text-stone-800">
             <Link
-              href="/"
+              href="/home"
               onClick={() => setMobileMenuOpen(false)}
               className="py-2 border-b border-stone-100 flex items-center justify-between"
             >
