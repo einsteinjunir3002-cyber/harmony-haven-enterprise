@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { formatCurrency, formatDate, ORDER_STATUS_FLOW } from '@/lib/utils';
+import { compressImageFile } from '@/lib/imageCompression';
 
 function AccountContent() {
   const router = useRouter();
@@ -69,43 +70,82 @@ function AccountContent() {
     }
   }, [user, isLoading, router]);
 
-  // Handle Photo File Upload
+  // Handle Photo File Upload with client-side compression and instant save
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 10 * 1024 * 1024) {
-      setSaveError('Photo is too large. Please select a photo under 10MB.');
-      return;
-    }
-
     setIsUploadingPhoto(true);
     setSaveError(null);
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('title', `${user?.name || 'User'} Profile Photo`);
+    setSaveSuccess(false);
 
-      const res = await fetch('/api/uploads', {
-        method: 'POST',
-        body: formData,
+    try {
+      // 1. Optimize and compress photo in browser to guarantee instant upload & prevent 413 limits
+      const compressed = await compressImageFile(file, {
+        maxWidth: 600,
+        maxHeight: 600,
+        quality: 0.85,
+        mimeType: 'image/jpeg',
       });
 
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to upload photo');
+      // 2. Set preview immediately in UI
+      setAvatar(compressed.dataUrl);
+
+      // 3. Automatically save photo directly to the user profile
+      const res = await fetch('/api/account/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          avatar: compressed.dataUrl,
+        }),
+      });
+
+      const resText = await res.text();
+      let resData: any = {};
+      try {
+        resData = JSON.parse(resText);
+      } catch {
+        if (!res.ok) {
+          throw new Error('Server returned an unexpected response. Please try again.');
+        }
       }
 
-      setAvatar(data.url);
+      if (!res.ok) {
+        throw new Error(resData.error || 'Failed to save profile photo');
+      }
+
+      // 4. Refresh global auth context so avatar updates everywhere (e.g. Header & Navbar)
+      await refreshUser();
       setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 4000);
+      setTimeout(() => setSaveSuccess(false), 5000);
     } catch (err: any) {
-      setSaveError(err.message || 'Could not upload photo');
+      console.error('Profile photo upload error:', err);
+      setSaveError(err.message || 'Could not upload photo. Please select a clear picture file.');
     } finally {
       setIsUploadingPhoto(false);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
+    }
+  };
+
+  // Handle Photo Removal
+  const handleRemovePhoto = async () => {
+    setAvatar('');
+    setSaveError(null);
+    try {
+      const res = await fetch('/api/account/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ avatar: null }),
+      });
+      if (res.ok) {
+        await refreshUser();
+        setSaveSuccess(true);
+        setTimeout(() => setSaveSuccess(false), 4000);
+      }
+    } catch (err: any) {
+      console.error('Failed to remove photo:', err);
     }
   };
 
@@ -127,15 +167,25 @@ function AccountContent() {
         }),
       });
 
-      const data = await res.json();
+      const resText = await res.text();
+      let resData: any = {};
+      try {
+        resData = JSON.parse(resText);
+      } catch {
+        if (!res.ok) {
+          throw new Error('Server returned an unexpected response. Please try again.');
+        }
+      }
+
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to update profile');
+        throw new Error(resData.error || 'Failed to update profile');
       }
 
       await refreshUser();
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 5000);
     } catch (err: any) {
+      console.error('Profile save error:', err);
       setSaveError(err.message || 'Failed to save changes');
     } finally {
       setIsSaving(false);
@@ -333,17 +383,17 @@ function AccountContent() {
                     {avatar && (
                       <button
                         type="button"
-                        onClick={() => setAvatar('')}
+                        onClick={handleRemovePhoto}
                         className="px-3 py-2 bg-stone-200 dark:bg-stone-700 hover:bg-rose-100 hover:text-rose-700 dark:hover:bg-rose-950/40 text-stone-700 dark:text-stone-300 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
-                        <span>Remove</span>
+                        <span>Remove Photo</span>
                       </button>
                     )}
                   </div>
 
                   <p className="text-[11px] text-stone-500 dark:text-stone-400">
-                    Upload any photo from your phone or computer (JPG, PNG, WebP, GIF up to 10MB).
+                    Upload any photo from your phone or computer (JPG, PNG, WebP). Your photo is automatically optimized for crystal-clear, fast loading.
                   </p>
 
                   {/* Direct Image URL input */}

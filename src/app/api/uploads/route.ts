@@ -46,30 +46,47 @@ export async function POST(request: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
+    const mimeType = file.type || (isVideo ? 'video/mp4' : 'image/jpeg');
+
     // Generate collision-proof randomized filename preserving true extension
     const finalExt = ext || (isVideo ? '.mp4' : '.jpg');
     const randomHash = crypto.randomBytes(12).toString('hex');
     const safeFilename = `${Date.now()}_${randomHash}${finalExt}`;
 
-    const publicUploadDir = path.join(process.cwd(), 'public', 'uploads');
-    const sunflowerUploadDir = path.join(process.cwd(), 'Sunflower Media', 'uploads');
+    let publicUrl = `/uploads/${safeFilename}`;
+    let diskSaved = false;
 
-    if (!fs.existsSync(publicUploadDir)) {
-      fs.mkdirSync(publicUploadDir, { recursive: true });
+    // Attempt to persist to filesystem (works on local/persistent servers)
+    try {
+      const publicUploadDir = path.join(process.cwd(), 'public', 'uploads');
+      const sunflowerUploadDir = path.join(process.cwd(), 'Sunflower Media', 'uploads');
+
+      if (!fs.existsSync(publicUploadDir)) {
+        fs.mkdirSync(publicUploadDir, { recursive: true });
+      }
+      if (!fs.existsSync(sunflowerUploadDir)) {
+        fs.mkdirSync(sunflowerUploadDir, { recursive: true });
+      }
+
+      // Save in public uploads for immediate web serving
+      const publicFilePath = path.join(publicUploadDir, safeFilename);
+      fs.writeFileSync(publicFilePath, buffer);
+
+      // Also mirror to central Sunflower Media repository
+      const sunflowerFilePath = path.join(sunflowerUploadDir, safeFilename);
+      fs.writeFileSync(sunflowerFilePath, buffer);
+      diskSaved = true;
+    } catch (fsErr: any) {
+      // Serverless environments (like Vercel AWS Lambda) have read-only file systems
+      console.warn('Filesystem write not supported in current environment, falling back to data URL:', fsErr?.message);
+      diskSaved = false;
     }
-    if (!fs.existsSync(sunflowerUploadDir)) {
-      fs.mkdirSync(sunflowerUploadDir, { recursive: true });
+
+    // If writing to disk failed (e.g. read-only serverless environment), return Data URL for instant rendering
+    if (!diskSaved) {
+      const base64Data = buffer.toString('base64');
+      publicUrl = `data:${mimeType};base64,${base64Data}`;
     }
-
-    // Save in public uploads for immediate web serving
-    const publicFilePath = path.join(publicUploadDir, safeFilename);
-    fs.writeFileSync(publicFilePath, buffer);
-
-    // Also mirror to central Sunflower Media repository
-    const sunflowerFilePath = path.join(sunflowerUploadDir, safeFilename);
-    fs.writeFileSync(sunflowerFilePath, buffer);
-
-    const publicUrl = `/uploads/${safeFilename}`;
 
     return NextResponse.json({
       success: true,
@@ -77,11 +94,15 @@ export async function POST(request: Request) {
       filename: safeFilename,
       originalName: file.name,
       size: file.size,
-      mimeType: file.type || (isVideo ? 'video/mp4' : 'image/jpeg'),
+      mimeType,
       isVideo,
+      diskSaved,
     });
   } catch (error: any) {
     console.error('File upload error:', error);
-    return NextResponse.json({ error: error.message || 'Failed to process file upload' }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || 'Failed to process file upload. Please select a smaller photo or retry.' },
+      { status: 500 }
+    );
   }
 }

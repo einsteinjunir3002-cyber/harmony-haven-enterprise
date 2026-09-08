@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sparkles, Upload, Heart, CheckCircle2, Calendar, Phone, User, MessageSquare, AlertCircle } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
+import { compressImageFile } from '@/lib/imageCompression';
 
 export function CustomOrderStudio() {
   const router = useRouter();
@@ -82,18 +83,47 @@ export function CustomOrderStudio() {
     setErrorMsg('');
 
     try {
+      let uploadFile: File = file;
+      let fallbackUrl = '';
+
+      if (file.type.startsWith('image/') || /\.(jpe?g|png|webp|gif|svg)$/i.test(file.name)) {
+        try {
+          const compressed = await compressImageFile(file, {
+            maxWidth: 1200,
+            maxHeight: 1200,
+            quality: 0.85,
+          });
+          uploadFile = compressed.file;
+          fallbackUrl = compressed.dataUrl;
+        } catch (compErr) {
+          console.warn('Compression skipped:', compErr);
+        }
+      }
+
       const data = new FormData();
-      data.append('file', file);
+      data.append('file', uploadFile);
 
       const res = await fetch('/api/uploads', {
         method: 'POST',
         body: data,
       });
 
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error || 'Failed to upload photo');
+      const resText = await res.text();
+      let json: any = {};
+      try {
+        json = JSON.parse(resText);
+      } catch {
+        if (!res.ok && !fallbackUrl) {
+          throw new Error('Upload server error. Please retry.');
+        }
+      }
 
-      setUploadedFiles((prev) => [...prev, json.url]);
+      const finalUrl = json.url || fallbackUrl;
+      if (!finalUrl) {
+        throw new Error(json.error || 'Failed to upload photo');
+      }
+
+      setUploadedFiles((prev) => [...prev, finalUrl]);
     } catch (err: any) {
       setErrorMsg(err.message || 'File upload failed');
     } finally {

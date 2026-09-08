@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Upload, Folder, Check, Trash2, Copy, Sparkles, AlertCircle, Video, Play, Film, X } from 'lucide-react';
+import { compressImageFile } from '@/lib/imageCompression';
 
 export default function SunflowerMediaPage() {
   const [selectedCategory, setSelectedCategory] = useState('ALL');
@@ -89,18 +90,56 @@ export default function SunflowerMediaPage() {
     setMessage('');
 
     try {
+      let uploadFile: File = file;
+      let fallbackUrl = '';
+      const isVid = file.type.startsWith('video/') || /\.(mp4|webm|ogg|mov|avi|mkv|flv|wmv|m4v|3gp)$/i.test(file.name);
+
+      // Auto-optimize images on the client
+      if (!isVid && (file.type.startsWith('image/') || /\.(jpe?g|png|webp|gif|svg)$/i.test(file.name))) {
+        try {
+          const compressed = await compressImageFile(file, {
+            maxWidth: 1600,
+            maxHeight: 1600,
+            quality: 0.85,
+          });
+          uploadFile = compressed.file;
+          fallbackUrl = compressed.dataUrl;
+        } catch (compErr) {
+          console.warn('Client compression skipped:', compErr);
+        }
+      }
+
       const data = new FormData();
-      data.append('file', file);
+      data.append('file', uploadFile);
 
       const res = await fetch('/api/uploads', {
         method: 'POST',
         body: data,
       });
 
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error || 'Upload failed');
+      const resText = await res.text();
+      let json: any = {};
+      try {
+        json = JSON.parse(resText);
+      } catch {
+        if (!res.ok) {
+          if (fallbackUrl) {
+            json = { url: fallbackUrl, isVideo: false, mimeType: 'image/jpeg' };
+          } else {
+            throw new Error('Upload server error. If uploading a large video, please verify file size.');
+          }
+        }
+      }
 
-      const isVid = json.isVideo || file.type.startsWith('video/') || /\.(mp4|webm|ogg|mov|avi|mkv|flv|wmv|m4v|3gp)$/i.test(file.name);
+      if (!res.ok && !json.url) {
+        if (fallbackUrl) {
+          json = { url: fallbackUrl, isVideo: false, mimeType: 'image/jpeg' };
+        } else {
+          throw new Error(json.error || 'Upload failed');
+        }
+      }
+
+      const finalUrl = json.url || fallbackUrl;
       const targetCategory = isVid ? 'VIDEOS' : 'UPLOADS';
 
       // Save to media database
@@ -110,7 +149,7 @@ export default function SunflowerMediaPage() {
         body: JSON.stringify({
           title: file.name,
           originalName: file.name,
-          url: json.url,
+          url: finalUrl,
           category: targetCategory,
           mimeType: json.mimeType || (isVid ? 'video/mp4' : 'image/jpeg'),
           size: file.size,
@@ -121,7 +160,7 @@ export default function SunflowerMediaPage() {
         {
           id: Date.now().toString(),
           title: file.name,
-          url: json.url,
+          url: finalUrl,
           category: targetCategory,
           mimeType: json.mimeType || (isVid ? 'video/mp4' : 'image/jpeg'),
         },

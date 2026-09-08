@@ -17,6 +17,7 @@ import {
   Layers,
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
+import { compressImageFile } from '@/lib/imageCompression';
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<any[]>([]);
@@ -113,26 +114,68 @@ export default function AdminProductsPage() {
     setErrorMsg('');
 
     try {
+      let uploadFile: File = file;
+      let fallbackUrl = '';
+
+      if (file.type.startsWith('image/') || /\.(jpe?g|png|webp|gif|svg)$/i.test(file.name)) {
+        try {
+          const compressed = await compressImageFile(file, {
+            maxWidth: 1200,
+            maxHeight: 1200,
+            quality: 0.85,
+          });
+          uploadFile = compressed.file;
+          fallbackUrl = compressed.dataUrl;
+        } catch (compErr) {
+          console.warn('Client compression skipped:', compErr);
+        }
+      }
+
       const data = new FormData();
-      data.append('file', file);
+      data.append('file', uploadFile);
 
       const res = await fetch('/api/uploads', {
         method: 'POST',
         body: data,
       });
 
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error || 'Upload failed');
+      const resText = await res.text();
+      let json: any = {};
+      try {
+        json = JSON.parse(resText);
+      } catch {
+        if (!res.ok) {
+          if (fallbackUrl) {
+            // If upload endpoint failed (e.g. read-only serverless), use dataUrl seamlessly
+            setEditingProduct((prev: any) => ({
+              ...prev,
+              images: [...(prev?.images || []), fallbackUrl],
+            }));
+            return;
+          }
+          throw new Error('Server returned an invalid response. Please retry.');
+        }
+      }
+
+      if (!res.ok) {
+        if (fallbackUrl) {
+          setEditingProduct((prev: any) => ({
+            ...prev,
+            images: [...(prev?.images || []), fallbackUrl],
+          }));
+          return;
+        }
+        throw new Error(json.error || 'Upload failed');
+      }
 
       setEditingProduct((prev: any) => ({
         ...prev,
-        images: [...(prev?.images || []), json.url],
+        images: [...(prev?.images || []), json.url || fallbackUrl],
       }));
     } catch (err: any) {
       setErrorMsg(err.message || 'Image upload failed');
     } finally {
       setUploadingImage(false);
-      // Reset input
       e.target.value = '';
     }
   };
