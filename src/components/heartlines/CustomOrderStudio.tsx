@@ -126,6 +126,15 @@ export function CustomOrderStudio() {
       if (!res.ok) throw new Error(data.error || 'Failed to submit custom order');
 
       setSuccessOrderNumber(data.orderNumber);
+      if (data.order) {
+        try {
+          sessionStorage.setItem('hh_last_order', JSON.stringify(data.order));
+          sessionStorage.setItem(`hh_order_${data.order.id}`, JSON.stringify(data.order));
+          localStorage.setItem(`hh_order_${data.order.id}`, JSON.stringify(data.order));
+        } catch (e) {
+          console.warn('Could not cache order in storage:', e);
+        }
+      }
       router.push(`/checkout/confirmation/${data.order.id}`);
     } catch (err: any) {
       setErrorMsg(err.message || 'Error submitting order');

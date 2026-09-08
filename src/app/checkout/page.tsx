@@ -147,7 +147,18 @@ export default function CheckoutPage() {
         throw new Error(verifyData.error || 'Payment verification encountered an issue');
       }
 
-      // 3. Clear cart and navigate to confirmation page
+      // 3. Cache confirmed order details in storage for instantaneous, reliable receipt display
+      if (orderData.order) {
+        try {
+          sessionStorage.setItem('hh_last_order', JSON.stringify(orderData.order));
+          sessionStorage.setItem(`hh_order_${orderId}`, JSON.stringify(orderData.order));
+          localStorage.setItem(`hh_order_${orderId}`, JSON.stringify(orderData.order));
+        } catch (e) {
+          console.warn('Could not cache order in storage:', e);
+        }
+      }
+
+      // 4. Clear cart and navigate to confirmation page
       clearCart();
       router.push(`/checkout/confirmation/${orderId}`);
     } catch (err: any) {
