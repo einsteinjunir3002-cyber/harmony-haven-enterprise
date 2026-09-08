@@ -22,20 +22,38 @@ export default function AdminMediaPage() {
     { name: 'UPLOADS', label: 'Sunflower Media/uploads' },
   ];
 
-  // Initial list seeded from the 25 client photos
+  // Initial list seeded from the 25 client photos plus founder portrait
   const staticMediaList = [
-    { title: 'Kowah Savory Soup Pot', url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.22.02 PM.jpeg', category: 'KOWAHS_DISHES' },
-    { title: 'Kowah Hot Box Assorted Meats', url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.20.31 PM.jpeg', category: 'KOWAHS_DISHES' },
-    { title: 'Fruity Sorrel Juice Bottle', url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.45.38 PM.jpeg', category: 'KOWAHS_DISHES' },
-    { title: 'Rich Ghanaian Shito Jar', url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.31.47 PM.jpeg', category: 'KOWAHS_DISHES' },
-    { title: '4U Heartlines Luxury Glee Box', url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.57.01 PM.jpeg', category: '4U_HEARTLINES' },
-    { title: '4U Heartlines Pamper Box', url: '/images/gallery/WhatsApp Image 2026-09-03 at 11.00.28 PM.jpeg', category: '4U_HEARTLINES' },
-    { title: '4U Heartlines Poetic Candle', url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.14.23 PM.jpeg', category: '4U_HEARTLINES' },
-    { title: '4U Heartlines Framed Poem Citation', url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.19.28 PM.jpeg', category: '4U_HEARTLINES' },
-    { title: 'Founder Portrait - Alberta Glory', url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.24.22 PM.jpeg', category: 'FOUNDER' },
-    { title: 'Special Day Box Gifting Ensemble', url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.24.59 PM.jpeg', category: '4U_HEARTLINES' },
-    { title: 'Pictures & Poems Keepsake Plaque', url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.23.34 PM.jpeg', category: '4U_HEARTLINES' },
-    { title: 'Artisanal Snack Box', url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.30.14 PM.jpeg', category: '4U_HEARTLINES' },
+    // Branding & Identity
+    { title: 'Harmony Haven Enterprise Corporate Logo', url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.14.23 PM.jpeg', category: 'BRANDING' },
+    { title: "Kowah's Dishes Official Logo", url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.14.23 PM (1).jpeg', category: 'BRANDING' },
+    { title: '4U HEARTLINES Official Logo', url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.14.22 PM.jpeg', category: 'BRANDING' },
+    // Kowah's Dishes Culinary & Beverages
+    { title: "Kowah's Dishes Official Menu Flyer", url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.31.46 PM.jpeg', category: 'KOWAHS_DISHES' },
+    { title: 'Savory Bowl - Rich Beef Stew Pot', url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.18.38 PM.jpeg', category: 'KOWAHS_DISHES' },
+    { title: 'Savory Bowl - Ghanaian Spiced Light Soup', url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.19.28 PM.jpeg', category: 'KOWAHS_DISHES' },
+    { title: 'Savory Bowl - Beef & Fresh Vegetable Stew', url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.20.31 PM.jpeg', category: 'KOWAHS_DISHES' },
+    { title: 'Hot Box - Sizzling Peppered Beef Medley', url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.21.06 PM.jpeg', category: 'KOWAHS_DISHES' },
+    { title: 'Hot Box - Seasoned Grilled Meat Chunks Platter', url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.22.02 PM.jpeg', category: 'KOWAHS_DISHES' },
+    { title: 'Fruity Sorrel Juice (Sobolo) Poster', url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.23.34 PM.jpeg', category: 'KOWAHS_DISHES' },
+    { title: 'Homedine Shito - Black & Green Pepper Jars', url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.24.22 PM.jpeg', category: 'KOWAHS_DISHES' },
+    // 4U Heartlines - Verse & Velvet Gift Boxes
+    { title: '4U Heartlines Package Flyer', url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.31.47 PM.jpeg', category: '4U_HEARTLINES' },
+    { title: 'Verse & Velvet - Girl Care Luxury Gift Box', url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.24.59 PM.jpeg', category: '4U_HEARTLINES' },
+    { title: 'Executive Appreciation - Gold Embossed Journal Suite', url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.25.52 PM (1).jpeg', category: '4U_HEARTLINES' },
+    { title: 'Verse & Velvet - Guy Care Luxury Gift Box', url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.25.52 PM.jpeg', category: '4U_HEARTLINES' },
+    { title: 'Executive Cream Journal & Citation Scroll Set', url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.29.27 PM.jpeg', category: '4U_HEARTLINES' },
+    // 4U Heartlines - Ink & Emotion Poems, Keepsakes & Citations
+    { title: 'Pictures & Poems - Tabletop Framed Poem & Photo', url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.27.18 PM.jpeg', category: '4U_HEARTLINES' },
+    { title: "Poetic Keepsake Tag - Winter's Embrace", url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.30.14 PM.jpeg', category: '4U_HEARTLINES' },
+    { title: 'Poetic Candle Citation - Burning Soy Tumbler', url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.30.55 PM.jpeg', category: '4U_HEARTLINES' },
+    { title: 'Poetic Memos - Hardbound Gold-Foil Keepsake Booklet', url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.45.38 PM.jpeg', category: '4U_HEARTLINES' },
+    { title: "Wax-Sealed Love Letters - 'To that person I like' by Kowah", url: '/images/gallery/WhatsApp Image 2026-09-03 at 10.57.01 PM.jpeg', category: '4U_HEARTLINES' },
+    { title: "Pictures & Poems - 'Heart lines to my forever person'", url: '/images/gallery/WhatsApp Image 2026-09-03 at 11.00.28 PM.jpeg', category: '4U_HEARTLINES' },
+    { title: "Celebration Keepsake - 'Best friends forever'", url: '/images/gallery/WhatsApp Image 2026-09-03 at 11.07.34 PM.jpeg', category: '4U_HEARTLINES' },
+    { title: "Pictures & Poems - 'when you cloud my thoughts' Album", url: '/images/gallery/WhatsApp Image 2026-09-03 at 11.07.35 PM.jpeg', category: '4U_HEARTLINES' },
+    // Founder Portrait
+    { title: 'Founder Portrait - Alberta Glory', url: '/images/gallery/alberta-glory-founder.jpg', category: 'FOUNDER' },
   ];
 
   const [items, setItems] = useState(staticMediaList);

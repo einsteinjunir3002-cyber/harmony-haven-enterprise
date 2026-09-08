@@ -90,7 +90,7 @@ export default async function FullHomePage() {
     name: 'Alberta Glory',
     biography:
       'Passionate entrepreneur and creative director leading Harmony Haven Enterprise with a vision to build homegrown Ghanaian brands that resonate globally through culinary delight and expressive gifting.',
-    photo: '/images/gallery/WhatsApp Image 2026-09-03 at 10.24.22 PM.jpeg',
+    photo: '/images/gallery/alberta-glory-founder.jpg',
   });
 
   return (

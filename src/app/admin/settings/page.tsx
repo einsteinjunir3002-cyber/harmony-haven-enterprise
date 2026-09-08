@@ -77,7 +77,7 @@ export default function AdminSettingsPage() {
             role: 'Founder & CEO',
             name: founderName,
             biography: founderBio,
-            photo: founderPhoto || '/images/gallery/WhatsApp Image 2026-09-03 at 10.24.22 PM.jpeg',
+            photo: founderPhoto || '/images/gallery/alberta-glory-founder.jpg',
           }),
         },
       ];
