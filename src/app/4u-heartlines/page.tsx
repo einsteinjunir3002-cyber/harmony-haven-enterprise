@@ -110,7 +110,7 @@ export default async function HeartlinesPage() {
         </div>
 
         <div className="space-y-16">
-          {brand.categories.map((category) => (
+          {brand.categories.map((category: any) => (
             <div key={category.id} className="space-y-6">
               <div className="border-b border-teal-200 pb-4 flex items-end justify-between">
                 <div>
@@ -122,12 +122,12 @@ export default async function HeartlinesPage() {
                   )}
                 </div>
                 <span className="text-xs font-bold text-teal-800 bg-teal-100 px-3 py-1 rounded-full">
-                  {category.products.length} {category.products.length === 1 ? 'offering' : 'offerings'}
+                  {category.products?.length || 0} {category.products?.length === 1 ? 'offering' : 'offerings'}
                 </span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {category.products.map((product) => (
+                {category.products?.map((product: any) => (
                   <ProductCard key={product.id} product={product as any} />
                 ))}
               </div>

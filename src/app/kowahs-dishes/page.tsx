@@ -129,7 +129,7 @@ export default async function KowahsDishesPage() {
 
         {/* Grouped by Category */}
         <div className="space-y-16">
-          {brand.categories.map((category) => (
+          {brand.categories.map((category: any) => (
             <div key={category.id} className="space-y-6">
               <div className="border-b border-kowah-200 pb-4 flex items-end justify-between">
                 <div>
@@ -141,12 +141,12 @@ export default async function KowahsDishesPage() {
                   )}
                 </div>
                 <span className="text-xs font-bold text-gold-700 bg-gold-100 px-3 py-1 rounded-full">
-                  {category.products.length} {category.products.length === 1 ? 'item' : 'items'}
+                  {category.products?.length || 0} {category.products?.length === 1 ? 'item' : 'items'}
                 </span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {category.products.map((product) => (
+                {category.products?.map((product: any) => (
                   <ProductCard key={product.id} product={product as any} />
                 ))}
               </div>
