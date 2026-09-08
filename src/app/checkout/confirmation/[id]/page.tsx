@@ -250,7 +250,7 @@ export default function OrderConfirmationPage({
                 <div className="w-3 h-3 rounded-full bg-harmony-900 mt-1.5 shrink-0" />
                 <div>
                   <p className="text-xs font-bold text-stone-900">
-                    {history.toStatus} {history.note && `&bull; ${history.note}`}
+                    {history.toStatus} {history.note && ` • ${history.note}`}
                   </p>
                   <p className="text-[11px] text-stone-400">
                     {formatDate(history.createdAt)} {history.actorName && `(${history.actorName})`}
