@@ -78,10 +78,31 @@ export default function AdminProductsPage() {
 
     try {
       const method = editingProduct.id ? 'PUT' : 'POST';
+      const payload = {
+        id: editingProduct.id,
+        brandId: editingProduct.brandId,
+        categoryId: editingProduct.categoryId || null,
+        name: editingProduct.name,
+        slug: editingProduct.slug,
+        description: editingProduct.description,
+        shortDescription: editingProduct.shortDescription,
+        price: editingProduct.price,
+        compareAtPrice: editingProduct.compareAtPrice,
+        sku: editingProduct.sku,
+        type: editingProduct.type,
+        active: editingProduct.active,
+        featured: editingProduct.featured,
+        trackInventory: editingProduct.trackInventory,
+        stockQuantity: editingProduct.stockQuantity,
+        images: editingProduct.images,
+        sortOrder: editingProduct.sortOrder,
+        variants: editingProduct.variants,
+      };
+
       const res = await fetch('/api/admin/products', {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editingProduct),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();

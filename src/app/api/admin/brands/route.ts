@@ -77,18 +77,44 @@ export async function PUT(request: Request) {
   try {
     const user = await requireAuth('ADMIN');
     const body = await request.json();
-    const { id, ...updateData } = body;
+    const {
+      id,
+      name,
+      slug,
+      tagline,
+      description,
+      logo,
+      banner,
+      primaryColor,
+      secondaryColor,
+      active,
+      sortOrder,
+    } = body;
 
     if (!id) {
       return NextResponse.json({ error: 'Brand ID is required.' }, { status: 400 });
     }
 
     const previous = await prisma.brand.findUnique({ where: { id } });
+    if (!previous) {
+      return NextResponse.json({ error: 'Brand not found.' }, { status: 404 });
+    }
 
     const updated = await prisma.$transaction(async (tx) => {
       const brand = await tx.brand.update({
         where: { id },
-        data: updateData,
+        data: {
+          name: name !== undefined ? name.trim() : undefined,
+          slug: slug !== undefined ? slug.trim() : undefined,
+          tagline: tagline !== undefined ? (tagline ? tagline.trim() : null) : undefined,
+          description: description !== undefined ? (description ? description.trim() : null) : undefined,
+          logo: logo !== undefined ? (logo || null) : undefined,
+          banner: banner !== undefined ? (banner || null) : undefined,
+          primaryColor: primaryColor !== undefined ? primaryColor : undefined,
+          secondaryColor: secondaryColor !== undefined ? secondaryColor : undefined,
+          active: active !== undefined ? Boolean(active) : undefined,
+          sortOrder: sortOrder !== undefined ? parseInt(sortOrder, 10) : undefined,
+        },
       });
 
       await tx.auditLog.create({
@@ -108,6 +134,8 @@ export async function PUT(request: Request) {
 
     return NextResponse.json({ success: true, brand: updated });
   } catch (error: any) {
+    console.error('Update brand error:', error);
     return NextResponse.json({ error: error.message || 'Failed to update brand' }, { status: 500 });
   }
 }
+

@@ -54,10 +54,24 @@ export default function AdminBrandsPage() {
 
     try {
       const method = editingBrand.id ? 'PUT' : 'POST';
+      const payload = {
+        id: editingBrand.id,
+        name: editingBrand.name,
+        slug: editingBrand.slug,
+        tagline: editingBrand.tagline,
+        description: editingBrand.description,
+        logo: editingBrand.logo,
+        banner: editingBrand.banner,
+        primaryColor: editingBrand.primaryColor,
+        secondaryColor: editingBrand.secondaryColor,
+        active: editingBrand.active,
+        sortOrder: editingBrand.sortOrder,
+      };
+
       const res = await fetch('/api/admin/brands', {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editingBrand),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();

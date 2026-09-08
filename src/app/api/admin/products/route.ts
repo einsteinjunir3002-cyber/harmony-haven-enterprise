@@ -118,23 +118,58 @@ export async function PUT(request: Request) {
   try {
     const user = await requireAuth('ADMIN');
     const body = await request.json();
-    const { id, variants, ...updateData } = body;
+    const {
+      id,
+      brandId,
+      categoryId,
+      name,
+      slug,
+      description,
+      shortDescription,
+      price,
+      compareAtPrice,
+      sku,
+      type,
+      active,
+      featured,
+      trackInventory,
+      stockQuantity,
+      images,
+      sortOrder,
+      variants,
+    } = body;
 
     if (!id) {
       return NextResponse.json({ error: 'Product ID is required.' }, { status: 400 });
     }
 
     const previousProduct = await prisma.product.findUnique({ where: { id } });
+    if (!previousProduct) {
+      return NextResponse.json({ error: 'Product not found.' }, { status: 404 });
+    }
 
     const updated = await prisma.$transaction(async (tx) => {
       const prod = await tx.product.update({
         where: { id },
         data: {
-          ...updateData,
-          price: updateData.price !== undefined ? parseFloat(updateData.price) : undefined,
-          compareAtPrice: updateData.compareAtPrice !== undefined ? (updateData.compareAtPrice ? parseFloat(updateData.compareAtPrice) : null) : undefined,
-          stockQuantity: updateData.stockQuantity !== undefined ? parseInt(updateData.stockQuantity, 10) : undefined,
-          images: Array.isArray(updateData.images) ? JSON.stringify(updateData.images) : updateData.images,
+          brand: brandId ? { connect: { id: brandId } } : undefined,
+          category: categoryId
+            ? { connect: { id: categoryId } }
+            : (previousProduct.categoryId ? { disconnect: true } : undefined),
+          name: name !== undefined ? name.trim() : undefined,
+          slug: slug !== undefined ? slug.trim() : undefined,
+          description: description !== undefined ? description : undefined,
+          shortDescription: shortDescription !== undefined ? (shortDescription || null) : undefined,
+          price: price !== undefined ? parseFloat(price) : undefined,
+          compareAtPrice: compareAtPrice !== undefined ? (compareAtPrice ? parseFloat(compareAtPrice) : null) : undefined,
+          sku: sku !== undefined ? (sku || null) : undefined,
+          type: type !== undefined ? type : undefined,
+          active: active !== undefined ? Boolean(active) : undefined,
+          featured: featured !== undefined ? Boolean(featured) : undefined,
+          trackInventory: trackInventory !== undefined ? Boolean(trackInventory) : undefined,
+          stockQuantity: stockQuantity !== undefined ? parseInt(stockQuantity, 10) : undefined,
+          images: images !== undefined ? (Array.isArray(images) ? JSON.stringify(images) : typeof images === 'string' ? images : '[]') : undefined,
+          sortOrder: sortOrder !== undefined ? parseInt(sortOrder, 10) : undefined,
         },
       });
 
