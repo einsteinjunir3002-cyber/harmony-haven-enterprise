@@ -59,8 +59,8 @@ export async function POST(request: Request) {
     const product = await prisma.$transaction(async (tx) => {
       const prod = await tx.product.create({
         data: {
-          brandId,
-          categoryId: categoryId || null,
+          brand: { connect: { id: brandId } },
+          category: categoryId ? { connect: { id: categoryId } } : undefined,
           name: name.trim(),
           slug: finalSlug,
           description: description || '',
