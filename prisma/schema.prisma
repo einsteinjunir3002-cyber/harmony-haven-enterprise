@@ -1,0 +1,290 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String     @id @default(cuid())
+  name         String
+  email        String     @unique
+  phone        String?
+  passwordHash String
+  role         String     @default("CUSTOMER") // CUSTOMER, STAFF, ADMIN, SUPER_ADMIN
+  status       String     @default("ACTIVE")   // ACTIVE, SUSPENDED, PENDING
+  addresses    Address[]
+  orders       Order[]
+  auditLogs    AuditLog[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model Brand {
+  id             String      @id @default(cuid())
+  name           String
+  slug           String      @unique
+  tagline        String?
+  description    String?
+  logo           String?
+  banner         String?
+  primaryColor   String?     @default("#0a4d52")
+  secondaryColor String?     @default("#d4af37")
+  active         Boolean     @default(true)
+  sortOrder      Int         @default(0)
+  categories     Category[]
+  products       Product[]
+  media          Media[]
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  brandId     String
+  brand       Brand     @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  name        String
+  slug        String
+  description String?
+  image       String?
+  active      Boolean   @default(true)
+  sortOrder   Int       @default(0)
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([brandId, slug])
+}
+
+model Product {
+  id               String           @id @default(cuid())
+  brandId          String
+  brand            Brand            @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  categoryId       String?
+  category         Category?        @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  name             String
+  slug             String           @unique
+  description      String
+  shortDescription String?
+  price            Float
+  compareAtPrice   Float?
+  sku              String?
+  type             String           @default("PHYSICAL_PRODUCT") // PHYSICAL_PRODUCT, SERVICE, CUSTOM_PRODUCT, MADE_TO_ORDER
+  active           Boolean          @default(true)
+  featured         Boolean          @default(false)
+  trackInventory   Boolean          @default(true)
+  stockQuantity    Int              @default(100)
+  images           String           @default("[]") // JSON string of image URLs
+  sortOrder        Int              @default(0)
+  variants         ProductVariant[]
+  orderItems       OrderItem[]
+  media            Media[]
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+}
+
+model ProductVariant {
+  id              String      @id @default(cuid())
+  productId       String
+  product         Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name            String      // e.g. "Regular (1.5L)", "Large", "Assorted Beef & Goat"
+  sku             String?
+  priceAdjustment Float       @default(0) // Added to base product price
+  stockQuantity   Int         @default(50)
+  optionsJson     String      @default("{}") // Options e.g. { "size": "1.5L", "spice": "Hot" }
+  orderItems      OrderItem[]
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model Order {
+  id                 String               @id @default(cuid())
+  orderNumber        String               @unique // e.g. HH-2026-000001
+  customerId         String?
+  customer           User?                @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  customerName       String
+  customerEmail      String
+  customerPhone      String
+  subtotal           Float
+  deliveryFee        Float                @default(0)
+  discount           Float                @default(0)
+  total              Float
+  currency           String               @default("GHS")
+  paymentStatus      String               @default("PENDING") // PENDING, PROCESSING, PAID, FAILED, REFUNDED, CANCELLED
+  fulfillmentStatus  String               @default("NEW")     // NEW, CONFIRMED, PREPARING, READY, READY_FOR_PICKUP, OUT_FOR_DELIVERY, DELIVERED, COLLECTED, CANCELLED
+  orderType          String               @default("STANDARD_PRODUCT_ORDER") // STANDARD_PRODUCT_ORDER, CUSTOM_REQUEST, SERVICE_REQUEST
+  deliveryMethod     String               @default("DELIVERY") // DELIVERY, PICKUP
+  deliveryAddressJson String?             // { region, city, area, digitalAddress, landmark, instructions }
+  preferredDate      String?
+  preferredTime      String?
+  notes              String?
+  internalNotes      String?
+  items              OrderItem[]
+  statusHistory      OrderStatusHistory[]
+  payments           Payment[]
+  customRequest      CustomRequest?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+}
+
+model OrderItem {
+  id                  String          @id @default(cuid())
+  orderId             String
+  order               Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId           String?
+  product             Product?        @relation(fields: [productId], references: [id], onDelete: SetNull)
+  variantId           String?
+  variant             ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  productName         String
+  variantName         String?
+  unitPrice           Float
+  quantity            Int
+  totalPrice          Float
+  personalizationJson String?         // Custom selections, poem notes, message, etc.
+  createdAt           DateTime        @default(now())
+}
+
+model OrderStatusHistory {
+  id         String            @id @default(cuid())
+  orderId    String
+  order      Order             @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  fromStatus String
+  toStatus   String
+  note       String?
+  actorId    String?
+  actorName  String?
+  createdAt  DateTime          @default(now())
+}
+
+model Payment {
+  id                String        @id @default(cuid())
+  orderId           String
+  order             Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  provider          String        @default("PAYSTACK") // PAYSTACK, MOBILE_MONEY, CARD, CASH_ON_DELIVERY
+  transactionRef    String        @unique
+  amount            Float
+  currency          String        @default("GHS")
+  status            String        @default("PENDING")
+  providerReference String?
+  rawResponseJson   String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+}
+
+model CustomRequest {
+  id                     String    @id @default(cuid())
+  orderId                String?   @unique
+  order                  Order?    @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  customerName           String
+  customerPhone          String
+  customerEmail          String?
+  recipientName          String
+  occasion               String    // Birthday, Anniversary, Appreciation, Milestone, Apology, Just Because
+  relationship           String    // Spouse, Parent, Best Friend, Sibling, Colleague
+  messageStory           String    // The personal story, memories, emotions to express
+  preferredColors        String?
+  poemTheme              String?   // Romantic, Gratitude, Uplifting, Nostalgic, Celebratory
+  tone                   String?   // Deeply Emotional, Playful, Elegant, Heartfelt
+  requestedItems         String?   // Glee Box, Pictures & Poems, Candle Citation, etc.
+  uploadedMediaJson      String?   @default("[]") // Array of customer uploaded photos
+  deadlineDate           String?
+  additionalInstructions String?
+  status                 String    @default("PENDING_REVIEW") // PENDING_REVIEW, ACCEPTED, IN_PRODUCTION, COMPLETED, DECLINED
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+}
+
+model Address {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label          String   @default("Home") // Home, Office, Other
+  recipientName  String
+  phone          String
+  region         String   @default("Greater Accra")
+  city           String
+  area           String
+  digitalAddress String?  // e.g. GA-123-4567
+  landmark       String?
+  instructions   String?
+  isDefault      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model DeliveryZone {
+  id            String   @id @default(cuid())
+  name          String   // e.g. "Accra Central", "Tema / Spintex", "East Legon / Madina", "Kumasi Metro"
+  region        String   // "Greater Accra", "Ashanti", etc.
+  fee           Float
+  estimatedTime String   @default("Same Day / Next Day")
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Media {
+  id           String   @id @default(cuid())
+  title        String
+  originalName String
+  url          String
+  mimeType     String   @default("image/jpeg")
+  size         Int      @default(0)
+  category     String   @default("GALLERY") // BRANDING, PRODUCT, GALLERY, FOUNDER, UPLOAD
+  brandId      String?
+  brand        Brand?   @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  productId    String?
+  product      Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  isHero       Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model ContentBlock {
+  id          String   @id @default(cuid())
+  key         String   @unique // e.g. "home.hero", "about.story", "about.mission", "about.vision", "about.values", "about.founder"
+  title       String
+  contentJson String   // JSON rich content
+  section     String   // "home", "about", "contact", "legal"
+  isPublic    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ContactInquiry {
+  id            String   @id @default(cuid())
+  name          String
+  email         String
+  phone         String?
+  subject       String
+  message       String
+  isPartnership Boolean  @default(false)
+  status        String   @default("NEW") // NEW, IN_REVIEW, RESPONDED, ARCHIVED
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model AuditLog {
+  id               String   @id @default(cuid())
+  actorId          String?
+  actor            User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  actorName        String
+  action           String   // e.g. "UPDATE_PRODUCT_PRICE", "CHANGE_ORDER_STATUS", "CREATE_BRAND"
+  entity           String   // e.g. "Product", "Order", "Brand"
+  entityId         String
+  previousStateJson String?
+  newStateJson     String?
+  ipAddress        String?
+  createdAt        DateTime @default(now())
+}
+
+model Setting {
+  id          String   @id @default(cuid())
+  key         String   @unique // e.g. "site_name", "business_phone", "whatsapp_link", "support_email", "currency"
+  valueJson   String   // JSON value
+  category    String   @default("GENERAL") // GENERAL, PAYMENTS, DELIVERY, NOTIFICATIONS, SOCIAL
+  description String?
+  updatedAt   DateTime @updatedAt
+}
