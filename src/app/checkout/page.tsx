@@ -17,6 +17,8 @@ import {
   Smartphone,
   Banknote,
   Check,
+  Loader2,
+  X,
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
@@ -35,6 +37,22 @@ export default function CheckoutPage() {
   const [momoPhone, setMomoPhone] = useState(user?.phone || '');
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+
+  // Live Mobile Money USSD Prompt Modal state
+  const [momoModalData, setMomoModalData] = useState<{
+    active: boolean;
+    orderId: string;
+    orderNumber: string;
+    reference: string;
+    phone: string;
+    network: 'MTN' | 'TELECEL' | 'AT';
+    amount: number;
+    displayText?: string;
+    simulated?: boolean;
+    status: 'waiting' | 'approved' | 'failed';
+    errorMessage?: string;
+  } | null>(null);
+  const [countdown, setCountdown] = useState(60);
 
   const [formData, setFormData] = useState({
     name: user?.name || '',
@@ -74,6 +92,69 @@ export default function CheckoutPage() {
       })
       .catch(() => {});
   }, []);
+
+  // Real-time polling effect to detect when the customer inputs their MoMo PIN on their phone
+  useEffect(() => {
+    if (!momoModalData?.active || momoModalData.status !== 'waiting') return;
+
+    setCountdown(60);
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(
+          `/api/payments/momo/status?reference=${encodeURIComponent(momoModalData.reference)}&orderId=${encodeURIComponent(momoModalData.orderId)}`
+        );
+        const data = await res.json();
+        if (data.paid || data.status === 'success') {
+          clearInterval(interval);
+          setMomoModalData((prev) => (prev ? { ...prev, status: 'approved' } : null));
+          clearCart();
+          setTimeout(() => {
+            router.push(`/checkout/confirmation/${momoModalData.orderId}`);
+          }, 1800);
+        } else if (data.status === 'failed') {
+          clearInterval(interval);
+          setMomoModalData((prev) => (prev ? { ...prev, status: 'failed', errorMessage: data.message } : null));
+        }
+      } catch (pollErr) {
+        console.warn('MoMo status polling notice:', pollErr);
+      }
+    }, 3000);
+
+    const timer = setInterval(() => {
+      setCountdown((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+      clearInterval(timer);
+    };
+  }, [momoModalData?.active, momoModalData?.status, momoModalData?.reference, momoModalData?.orderId, clearCart, router]);
+
+  // Handle simulated PIN approval for testing
+  const handleSimulatePinApproval = async () => {
+    if (!momoModalData) return;
+    try {
+      const res = await fetch('/api/payments/momo/status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          reference: momoModalData.reference,
+          orderId: momoModalData.orderId,
+          simulateApproval: true,
+        }),
+      });
+      const data = await res.json();
+      if (data.success || data.paid) {
+        setMomoModalData((prev) => (prev ? { ...prev, status: 'approved' } : null));
+        clearCart();
+        setTimeout(() => {
+          router.push(`/checkout/confirmation/${momoModalData.orderId}`);
+        }, 1800);
+      }
+    } catch (e: any) {
+      console.error('Simulate PIN error:', e);
+    }
+  };
 
   const selectedZone = deliveryZones.find((z) => z.id === selectedZoneId);
   const deliveryFee = deliveryMethod === 'DELIVERY' ? selectedZone?.fee || 25.0 : 0.0;
@@ -142,24 +223,50 @@ export default function CheckoutPage() {
 
       const orderId = orderData.order.id;
 
-      // 2. If paying before delivery via MoMo, register payment reference
+      // 2. If paying before delivery via MoMo, trigger live USSD prompt to customer's phone
       if (paymentTiming === 'PAY_BEFORE_DELIVERY') {
-        const reference = `MOMO_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
-        try {
-          await fetch('/api/payments/verify', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              reference,
-              orderId,
-            }),
-          });
-        } catch (payErr) {
-          console.warn('Payment recording note:', payErr);
+        const chargeRes = await fetch('/api/payments/momo/charge', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderId,
+            phone: momoPhone || formData.phone,
+            network: momoNetwork,
+          }),
+        });
+
+        const chargeData = await chargeRes.json();
+        if (!chargeRes.ok) {
+          throw new Error(chargeData.error || 'Failed to trigger Mobile Money prompt on your phone.');
         }
+
+        // Cache order data for receipt
+        if (orderData.order) {
+          try {
+            sessionStorage.setItem('hh_last_order', JSON.stringify(orderData.order));
+            sessionStorage.setItem(`hh_order_${orderId}`, JSON.stringify(orderData.order));
+            localStorage.setItem(`hh_order_${orderId}`, JSON.stringify(orderData.order));
+          } catch (e) {}
+        }
+
+        // Open live USSD push prompt modal on screen
+        setMomoModalData({
+          active: true,
+          orderId,
+          orderNumber: orderData.order.orderNumber,
+          reference: chargeData.reference,
+          phone: momoPhone || formData.phone,
+          network: momoNetwork,
+          amount: orderData.order.total,
+          displayText: chargeData.displayText,
+          simulated: chargeData.simulated,
+          status: 'waiting',
+        });
+        setIsProcessing(false);
+        return;
       }
 
-      // 3. Cache confirmed order details in storage for instantaneous, reliable receipt display
+      // 3. For Payment on Delivery: Cache confirmed order details in storage
       if (orderData.order) {
         try {
           sessionStorage.setItem('hh_last_order', JSON.stringify(orderData.order));
@@ -692,6 +799,205 @@ export default function CheckoutPage() {
           </div>
         </div>
       </form>
+
+      {/* Real-Time Mobile Money USSD Push Prompt Modal */}
+      {momoModalData?.active && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 border border-stone-200 shadow-2xl space-y-6 relative overflow-hidden">
+            {/* Top decorative gradient bar */}
+            <div
+              className={`absolute top-0 left-0 right-0 h-2.5 ${
+                momoModalData.network === 'MTN'
+                  ? 'bg-amber-400'
+                  : momoModalData.network === 'TELECEL'
+                  ? 'bg-rose-600'
+                  : 'bg-blue-600'
+              }`}
+            />
+
+            {/* Waiting State: Prompt Sent, waiting for PIN */}
+            {momoModalData.status === 'waiting' && (
+              <div className="text-center space-y-5">
+                {/* Animated Pulsing Phone Icon */}
+                <div className="relative mx-auto w-20 h-20 flex items-center justify-center">
+                  <div
+                    className={`absolute inset-0 rounded-full animate-ping opacity-25 ${
+                      momoModalData.network === 'MTN'
+                        ? 'bg-amber-400'
+                        : momoModalData.network === 'TELECEL'
+                        ? 'bg-rose-500'
+                        : 'bg-blue-500'
+                    }`}
+                  />
+                  <div
+                    className={`w-16 h-16 rounded-full flex items-center justify-center shadow-md relative z-10 ${
+                      momoModalData.network === 'MTN'
+                        ? 'bg-amber-400 text-amber-950 ring-4 ring-amber-100'
+                        : momoModalData.network === 'TELECEL'
+                        ? 'bg-rose-600 text-white ring-4 ring-rose-100'
+                        : 'bg-blue-600 text-white ring-4 ring-blue-100'
+                    }`}
+                  >
+                    <Smartphone className="w-8 h-8 animate-bounce" />
+                  </div>
+                </div>
+
+                <div>
+                  <span
+                    className={`text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full ${
+                      momoModalData.network === 'MTN'
+                        ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                        : momoModalData.network === 'TELECEL'
+                        ? 'bg-rose-100 text-rose-900 border border-rose-300'
+                        : 'bg-blue-100 text-blue-900 border border-blue-300'
+                    }`}
+                  >
+                    {momoModalData.network} MoMo USSD Prompt Sent
+                  </span>
+                  <h3 className="font-serif font-bold text-2xl text-stone-900 mt-2">
+                    Check Your Phone Screen!
+                  </h3>
+                  <p className="text-xs text-stone-600 mt-1">
+                    An authorization prompt has been sent to{' '}
+                    <strong className="text-stone-900 font-mono text-sm">{momoModalData.phone}</strong>.
+                  </p>
+                </div>
+
+                {/* Amount Pill */}
+                <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200/80 flex items-center justify-between">
+                  <span className="text-xs text-stone-500 font-medium">Amount to Authorize:</span>
+                  <span className="text-xl font-bold font-serif text-harmony-950">
+                    {formatCurrency(momoModalData.amount)}
+                  </span>
+                </div>
+
+                {/* Radar Polling Status */}
+                <div className="flex items-center justify-center gap-2 text-xs font-semibold text-harmony-900 bg-harmony-50 py-2.5 px-4 rounded-xl border border-harmony-200/60">
+                  <Loader2 className="w-4 h-4 animate-spin text-harmony-900" />
+                  <span>Waiting for your PIN input on your phone ({countdown}s)...</span>
+                </div>
+
+                {/* USSD Fallback Accordion / Instructions */}
+                <div className="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200 text-left text-[11px] text-amber-900 space-y-1">
+                  <p className="font-bold flex items-center gap-1">
+                    <span>💡 Prompt didn't appear automatically on your screen?</span>
+                  </p>
+                  {momoModalData.network === 'MTN' && (
+                    <p className="leading-relaxed">
+                      Dial <strong>*170#</strong> &rarr; Option <strong>6</strong> (My Wallet) &rarr; Option <strong>3</strong> (My Approvals) &rarr; Enter MoMo PIN to authorize.
+                    </p>
+                  )}
+                  {momoModalData.network === 'TELECEL' && (
+                    <p className="leading-relaxed">
+                      Dial <strong>*110#</strong> &rarr; Option <strong>4</strong> (My Account) &rarr; Option <strong>5</strong> (Pending Approvals) &rarr; Enter Cash PIN.
+                    </p>
+                  )}
+                  {momoModalData.network === 'AT' && (
+                    <p className="leading-relaxed">
+                      Dial <strong>*110#</strong> and check your Pending Approvals to authorize.
+                    </p>
+                  )}
+                </div>
+
+                {/* Simulated Approval for Testing / Placeholder Mode */}
+                {momoModalData.simulated && (
+                  <div className="pt-1">
+                    <button
+                      type="button"
+                      onClick={handleSimulatePinApproval}
+                      className="w-full py-2.5 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5"
+                    >
+                      <CheckCircle2 className="w-4 h-4 text-emerald-200" />
+                      <span>Simulate Phone PIN Approval (Test Mode)</span>
+                    </button>
+                    <p className="text-[10px] text-stone-400 mt-1">
+                      (Click to simulate successful PIN input on this test order)
+                    </p>
+                  </div>
+                )}
+
+                {/* Cancel / Switch Option */}
+                <div className="pt-2 border-t border-stone-100 flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={() => setMomoModalData(null)}
+                    className="text-xs text-stone-500 hover:text-stone-800 font-semibold"
+                  >
+                    Close Window
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMomoModalData(null);
+                      setPaymentTiming('PAY_ON_DELIVERY');
+                    }}
+                    className="text-xs text-harmony-900 hover:underline font-bold"
+                  >
+                    Switch to Payment on Delivery
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Approved State */}
+            {momoModalData.status === 'approved' && (
+              <div className="text-center space-y-4 py-4 animate-scaleUp">
+                <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-md">
+                  <CheckCircle2 className="w-10 h-10" />
+                </div>
+                <div>
+                  <h3 className="font-serif font-bold text-2xl text-stone-900">
+                    Payment Approved!
+                  </h3>
+                  <p className="text-xs text-emerald-800 mt-1 font-medium">
+                    Your Mobile Money payment of {formatCurrency(momoModalData.amount)} was verified.
+                  </p>
+                </div>
+                <div className="p-3 bg-emerald-50 text-emerald-900 rounded-xl text-xs flex items-center justify-center gap-2 font-bold">
+                  <Loader2 className="w-4 h-4 animate-spin text-emerald-700" />
+                  <span>Finalizing your receipt and alerting admin...</span>
+                </div>
+              </div>
+            )}
+
+            {/* Failed State */}
+            {momoModalData.status === 'failed' && (
+              <div className="text-center space-y-4 py-2">
+                <div className="w-14 h-14 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto">
+                  <AlertCircle className="w-8 h-8" />
+                </div>
+                <div>
+                  <h3 className="font-serif font-bold text-xl text-stone-900">
+                    Prompt Timed Out or Declined
+                  </h3>
+                  <p className="text-xs text-stone-500 mt-1">
+                    {momoModalData.errorMessage || 'The authorization was cancelled on the phone or timed out.'}
+                  </p>
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setMomoModalData((prev) => (prev ? { ...prev, status: 'waiting' } : null))}
+                    className="flex-1 py-2.5 rounded-xl bg-harmony-900 text-white text-xs font-bold"
+                  >
+                    Retry Prompt
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMomoModalData(null);
+                      setPaymentTiming('PAY_ON_DELIVERY');
+                    }}
+                    className="flex-1 py-2.5 rounded-xl bg-stone-100 text-stone-700 text-xs font-bold"
+                  >
+                    Pay on Delivery
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
