@@ -49,10 +49,11 @@ export async function POST(request: Request) {
     const orderNumber = generateOrderNumber();
 
     const isPayOnDelivery = paymentTiming === 'PAY_ON_DELIVERY';
-    const initialPaymentStatus = isPayOnDelivery ? 'PAY_ON_DELIVERY' : 'PAID';
+    const initialPaymentStatus = isPayOnDelivery ? 'PAY_ON_DELIVERY' : 'PENDING';
+    const initialFulfillmentStatus = isPayOnDelivery ? 'CONFIRMED' : 'NEW';
     const paymentModeLabel = isPayOnDelivery
       ? 'Payment on Delivery (MoMo on arrival)'
-      : 'Pay Before Delivery (Instant MoMo)';
+      : 'Pay Before Delivery (MoMo PIN prompt)';
 
     // 2. Transactional creation of Order, OrderItems, OrderStatusHistory, and inventory deduction
     const newOrder = await prisma.$transaction(async (tx) => {
@@ -70,7 +71,7 @@ export async function POST(request: Request) {
           total: calculation.total,
           currency: calculation.currency,
           paymentStatus: initialPaymentStatus,
-          fulfillmentStatus: 'CONFIRMED',
+          fulfillmentStatus: initialFulfillmentStatus,
           orderType: 'STANDARD_PRODUCT_ORDER',
           deliveryMethod: deliveryMethod || 'DELIVERY',
           deliveryAddressJson: deliveryAddress ? JSON.stringify(deliveryAddress) : null,
@@ -93,7 +94,7 @@ export async function POST(request: Request) {
           statusHistory: {
             create: {
               fromStatus: 'NEW',
-              toStatus: 'CONFIRMED',
+              toStatus: initialFulfillmentStatus,
               note: `Order placed by customer (${paymentModeLabel} - ${momoNetwork})`,
               actorName: customerName.trim(),
             },
