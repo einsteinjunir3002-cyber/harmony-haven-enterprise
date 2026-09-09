@@ -34,6 +34,17 @@ export async function POST(request: Request) {
     }
 
     const currentUser = await getCurrentUser();
+    let validCustomerId: string | null = null;
+    if (currentUser?.id) {
+      const existingUser = await prisma.user.findUnique({
+        where: { id: currentUser.id },
+        select: { id: true },
+      });
+      if (existingUser) {
+        validCustomerId = existingUser.id;
+      }
+    }
+
     const orderNumber = generateOrderNumber();
     const initialPrice = basePrice ? parseFloat(basePrice) : 160.0;
 
@@ -42,7 +53,7 @@ export async function POST(request: Request) {
       const order = await tx.order.create({
         data: {
           orderNumber,
-          customerId: currentUser?.id || null,
+          customerId: validCustomerId,
           customerName: customerName.trim(),
           customerEmail: (customerEmail || 'orders@harmonyhaven.com').trim().toLowerCase(),
           customerPhone: customerPhone.trim(),

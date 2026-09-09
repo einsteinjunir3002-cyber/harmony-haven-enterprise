@@ -9,7 +9,7 @@ export async function GET() {
       return NextResponse.json({ user: null });
     }
 
-    const fullUser = await prisma.user.findUnique({
+    let fullUser = await prisma.user.findUnique({
       where: { id: sessionUser.id },
       select: {
         id: true,
@@ -22,7 +22,45 @@ export async function GET() {
       },
     });
 
-    if (!fullUser || fullUser.status === 'SUSPENDED') {
+    if (!fullUser && sessionUser.email) {
+      fullUser = await prisma.user.findUnique({
+        where: { email: sessionUser.email },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          avatar: true,
+          role: true,
+          status: true,
+        },
+      });
+    }
+
+    if (!fullUser) {
+      // Auto-heal missing user record
+      fullUser = await prisma.user.create({
+        data: {
+          id: sessionUser.id,
+          name: sessionUser.name || 'Valued Customer',
+          email: sessionUser.email || `customer_${sessionUser.id}@harmonyhaven.com`,
+          passwordHash: 'SESSION_AUTHENTICATED',
+          role: sessionUser.role || 'CUSTOMER',
+          status: 'ACTIVE',
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          avatar: true,
+          role: true,
+          status: true,
+        },
+      });
+    }
+
+    if (fullUser.status === 'SUSPENDED') {
       return NextResponse.json({ user: null });
     }
 

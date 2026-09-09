@@ -9,7 +9,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Please sign in to view your profile' }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    let user = await prisma.user.findUnique({
       where: { id: sessionUser.id },
       select: {
         id: true,
@@ -26,8 +26,51 @@ export async function GET() {
       },
     });
 
+    // Fallback: lookup by email if id mismatch
+    if (!user && sessionUser.email) {
+      user = await prisma.user.findUnique({
+        where: { email: sessionUser.email },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          avatar: true,
+          role: true,
+          status: true,
+          createdAt: true,
+          addresses: {
+            orderBy: { isDefault: 'desc' },
+          },
+        },
+      });
+    }
+
+    // Auto-heal missing user record
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      user = await prisma.user.create({
+        data: {
+          id: sessionUser.id,
+          name: sessionUser.name || 'Valued Customer',
+          email: sessionUser.email || `customer_${sessionUser.id}@harmonyhaven.com`,
+          passwordHash: 'SESSION_AUTHENTICATED',
+          role: sessionUser.role || 'CUSTOMER',
+          status: 'ACTIVE',
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          avatar: true,
+          role: true,
+          status: true,
+          createdAt: true,
+          addresses: {
+            orderBy: { isDefault: 'desc' },
+          },
+        },
+      });
     }
 
     return NextResponse.json({ user });
@@ -47,23 +90,61 @@ export async function PUT(request: Request) {
     const body = await request.json();
     const { name, phone, avatar } = body;
 
-    const updatedUser = await prisma.user.update({
+    // 1. Locate existing user by ID or by email
+    let existingUser = await prisma.user.findUnique({
       where: { id: sessionUser.id },
-      data: {
-        ...(name ? { name: name.trim() } : {}),
-        phone: phone !== undefined ? (phone ? phone.trim() : null) : undefined,
-        avatar: avatar !== undefined ? (avatar ? avatar.trim() : null) : undefined,
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        phone: true,
-        avatar: true,
-        role: true,
-        status: true,
-      },
     });
+
+    if (!existingUser && sessionUser.email) {
+      existingUser = await prisma.user.findUnique({
+        where: { email: sessionUser.email },
+      });
+    }
+
+    let updatedUser;
+    if (existingUser) {
+      updatedUser = await prisma.user.update({
+        where: { id: existingUser.id },
+        data: {
+          ...(name ? { name: name.trim() } : {}),
+          phone: phone !== undefined ? (phone ? phone.trim() : null) : undefined,
+          avatar: avatar !== undefined ? (avatar ? avatar.trim() : null) : undefined,
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          avatar: true,
+          role: true,
+          status: true,
+        },
+      });
+    } else {
+      // Auto-heal: create the user record with the updated profile data
+      const targetEmail = sessionUser.email || `customer_${sessionUser.id}@harmonyhaven.com`;
+      updatedUser = await prisma.user.create({
+        data: {
+          id: sessionUser.id,
+          email: targetEmail,
+          name: name?.trim() || sessionUser.name || 'Valued Customer',
+          phone: phone ? phone.trim() : null,
+          avatar: avatar ? avatar.trim() : null,
+          passwordHash: 'SESSION_AUTHENTICATED',
+          role: sessionUser.role || 'CUSTOMER',
+          status: 'ACTIVE',
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          avatar: true,
+          role: true,
+          status: true,
+        },
+      });
+    }
 
     return NextResponse.json({
       success: true,

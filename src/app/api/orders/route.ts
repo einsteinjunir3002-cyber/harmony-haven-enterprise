@@ -48,6 +48,28 @@ export async function POST(request: Request) {
 
     const orderNumber = generateOrderNumber();
 
+    // Verify customerId against database to prevent Foreign key constraint violated
+    let validCustomerId: string | null = null;
+    if (currentUser?.id) {
+      const existingUser = await prisma.user.findUnique({
+        where: { id: currentUser.id },
+        select: { id: true },
+      });
+      if (existingUser) {
+        validCustomerId = existingUser.id;
+      }
+    }
+
+    if (!validCustomerId && customerEmail) {
+      const userByEmail = await prisma.user.findUnique({
+        where: { email: customerEmail.trim().toLowerCase() },
+        select: { id: true },
+      });
+      if (userByEmail) {
+        validCustomerId = userByEmail.id;
+      }
+    }
+
     const isPayOnDelivery = paymentTiming === 'PAY_ON_DELIVERY';
     const initialPaymentStatus = isPayOnDelivery ? 'PAY_ON_DELIVERY' : 'PENDING';
     const initialFulfillmentStatus = isPayOnDelivery ? 'CONFIRMED' : 'NEW';
@@ -61,7 +83,7 @@ export async function POST(request: Request) {
       const order = await tx.order.create({
         data: {
           orderNumber,
-          customerId: currentUser?.id || null,
+          customerId: validCustomerId,
           customerName: customerName.trim(),
           customerEmail: customerEmail.trim().toLowerCase(),
           customerPhone: customerPhone.trim(),
