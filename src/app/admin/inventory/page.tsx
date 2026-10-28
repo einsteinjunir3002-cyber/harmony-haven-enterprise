@@ -25,6 +25,8 @@ export default function AdminInventoryPage() {
   const [stockChanges, setStockChanges] = useState<{ [key: string]: number }>({});
   const [savingKey, setSavingKey] = useState<string | null>(null);
   const [savedKey, setSavedKey] = useState<string | null>(null);
+  const [savingAll, setSavingAll] = useState(false);
+  const [bulkSuccessMsg, setBulkSuccessMsg] = useState('');
   const [expandedProducts, setExpandedProducts] = useState<{ [key: string]: boolean }>({});
 
   const fetchInventory = async () => {
@@ -64,9 +66,9 @@ export default function AdminInventoryPage() {
     }));
   };
 
-  const handleSaveStock = async (productId: string, variantId?: string) => {
+  const handleSaveStock = async (productId: string, variantId?: string, fallbackStock?: number) => {
     const key = variantId || productId;
-    const newStock = stockChanges[key];
+    const newStock = stockChanges[key] !== undefined ? stockChanges[key] : fallbackStock;
     if (newStock === undefined) return;
 
     setSavingKey(key);
@@ -91,6 +93,65 @@ export default function AdminInventoryPage() {
       alert(err.message || 'Error updating stock');
     } finally {
       setSavingKey(null);
+    }
+  };
+
+  // Find all keys with unsaved dirty changes
+  const dirtyEntries = Object.entries(stockChanges).filter(([key, val]) => {
+    for (const p of products) {
+      if (p.id === key) return p.stockQuantity !== val;
+      if (p.variants) {
+        for (const v of p.variants) {
+          if (v.id === key) return v.stockQuantity !== val;
+        }
+      }
+    }
+    return false;
+  });
+
+  const handleSaveAllStock = async () => {
+    if (dirtyEntries.length === 0) {
+      setBulkSuccessMsg('All inventory levels are already saved and up-to-date!');
+      setTimeout(() => setBulkSuccessMsg(''), 3500);
+      return;
+    }
+
+    setSavingAll(true);
+    setBulkSuccessMsg('');
+    try {
+      const promises = dirtyEntries.map(([key, newStock]) => {
+        let isVariant = false;
+        let parentProductId = '';
+        for (const p of products) {
+          if (p.variants?.some((v: any) => v.id === key)) {
+            isVariant = true;
+            parentProductId = p.id;
+            break;
+          }
+        }
+        return fetch('/api/admin/inventory', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            productId: isVariant ? undefined : key,
+            variantId: isVariant ? key : undefined,
+            stockQuantity: newStock,
+          }),
+        });
+      });
+
+      const results = await Promise.all(promises);
+      const allOk = results.every((r) => r.ok);
+      if (!allOk) throw new Error('Some items failed to update. Please check individual rows.');
+
+      setBulkSuccessMsg(`Successfully saved ${dirtyEntries.length} inventory updates!`);
+      setStockChanges({});
+      setTimeout(() => setBulkSuccessMsg(''), 4500);
+      fetchInventory();
+    } catch (err: any) {
+      alert(err.message || 'Error saving inventory changes');
+    } finally {
+      setSavingAll(false);
     }
   };
 
@@ -145,17 +206,47 @@ export default function AdminInventoryPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div>
-        <span className="text-xs font-bold uppercase tracking-widest text-gold-700 block">
-          Stock Control & Auditing
-        </span>
-        <h1 className="font-serif font-bold text-3xl text-stone-950 mt-1">
-          Inventory Management
-        </h1>
-        <p className="text-stone-500 text-xs mt-1">
-          Real-time warehouse stock tracking, low-inventory notifications, and instant quantity adjustments.
-        </p>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <span className="text-xs font-bold uppercase tracking-widest text-gold-700 block">
+            Stock Control & Auditing
+          </span>
+          <h1 className="font-serif font-bold text-3xl text-stone-950 mt-1">
+            Inventory Management
+          </h1>
+          <p className="text-stone-500 text-xs mt-1">
+            Real-time warehouse stock tracking, low-inventory notifications, and instant quantity adjustments.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleSaveAllStock}
+            disabled={savingAll}
+            className={`px-6 py-3 rounded-full font-bold text-xs uppercase tracking-wider shadow-md flex items-center gap-2 transition-all ${
+              dirtyEntries.length > 0
+                ? 'bg-gold-500 hover:bg-gold-600 text-stone-950 ring-2 ring-gold-400 animate-bounce'
+                : 'bg-harmony-900 hover:bg-harmony-950 text-white'
+            }`}
+          >
+            <Save className="w-4 h-4 text-gold-400" />
+            <span>
+              {savingAll
+                ? 'Saving Changes...'
+                : dirtyEntries.length > 0
+                ? `Save All Changes (${dirtyEntries.length} Pending)`
+                : 'Save All Stock Levels'}
+            </span>
+          </button>
+        </div>
       </div>
+
+      {bulkSuccessMsg && (
+        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2 shadow-xs">
+          <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+          <span>{bulkSuccessMsg}</span>
+        </div>
+      )}
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -405,16 +496,19 @@ export default function AdminInventoryPage() {
                               +5
                             </button>
 
-                            {isDirty && (
-                              <button
-                                onClick={() => handleSaveStock(prod.id)}
-                                disabled={isSaving}
-                                className="px-3 py-1 rounded-lg bg-harmony-900 hover:bg-harmony-950 text-white font-bold text-[10px] uppercase tracking-wider flex items-center gap-1 shadow-xs transition-all"
-                              >
-                                {isSaving ? '...' : <Save className="w-3 h-3" />}
-                                <span>Save</span>
-                              </button>
-                            )}
+                            <button
+                              onClick={() => handleSaveStock(prod.id, undefined, currentVal)}
+                              disabled={isSaving}
+                              className={`px-3 py-1.5 rounded-lg font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-xs ${
+                                isDirty
+                                  ? 'bg-gold-500 hover:bg-gold-600 text-stone-950 ring-2 ring-gold-400/80 animate-pulse'
+                                  : 'bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-200'
+                              }`}
+                              title={isDirty ? 'Click to save pending stock changes' : 'Click to save current stock level'}
+                            >
+                              {isSaving ? '...' : <Save className={`w-3 h-3 ${isDirty ? 'text-stone-950' : 'text-stone-500'}`} />}
+                              <span>{isDirty ? 'Save *' : 'Save'}</span>
+                            </button>
 
                             {isSaved && (
                               <span className="text-emerald-600 flex items-center gap-1 text-[11px] font-bold">
@@ -485,15 +579,19 @@ export default function AdminInventoryPage() {
                                     +
                                   </button>
 
-                                  {vIsDirty && (
-                                    <button
-                                      onClick={() => handleSaveStock(prod.id, v.id)}
-                                      disabled={vIsSaving}
-                                      className="px-2.5 py-0.5 rounded bg-harmony-900 text-white font-bold text-[9px] uppercase"
-                                    >
-                                      {vIsSaving ? '...' : 'Save'}
-                                    </button>
-                                  )}
+                                  <button
+                                    onClick={() => handleSaveStock(prod.id, v.id, vCurrentVal)}
+                                    disabled={vIsSaving}
+                                    className={`px-2.5 py-1 rounded font-bold text-[9px] uppercase tracking-wider flex items-center gap-1 transition-all ${
+                                      vIsDirty
+                                        ? 'bg-gold-500 hover:bg-gold-600 text-stone-950 ring-1 ring-gold-400'
+                                        : 'bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-200'
+                                    }`}
+                                    title={vIsDirty ? 'Click to save variant stock changes' : 'Click to save variant stock'}
+                                  >
+                                    {vIsSaving ? '...' : <Save className="w-2.5 h-2.5" />}
+                                    <span>{vIsDirty ? 'Save *' : 'Save'}</span>
+                                  </button>
 
                                   {vIsSaved && (
                                     <span className="text-emerald-600 flex items-center gap-0.5 text-[10px] font-bold">

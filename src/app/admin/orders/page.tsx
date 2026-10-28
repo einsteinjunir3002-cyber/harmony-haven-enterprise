@@ -16,6 +16,7 @@ import {
   Phone,
   Mail,
   MapPin,
+  Save,
 } from 'lucide-react';
 import { formatCurrency, formatDate, ORDER_STATUS_FLOW } from '@/lib/utils';
 
@@ -241,12 +242,23 @@ export default function AdminOrdersPage() {
                   {selectedOrder.orderNumber}
                 </h2>
               </div>
-              <button
-                onClick={() => setIsDrawerOpen(false)}
-                className="p-1.5 text-stone-400 hover:text-stone-700 rounded-full hover:bg-stone-100"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleUpdateStatus}
+                  disabled={updatingStatus}
+                  className="px-4 py-2 rounded-xl bg-harmony-900 hover:bg-harmony-950 text-white font-bold uppercase tracking-wider text-[11px] disabled:opacity-50 shadow-xs flex items-center gap-1.5 transition-all"
+                >
+                  <Save className="w-3.5 h-3.5 text-gold-400" />
+                  <span>{updatingStatus ? 'Updating...' : 'Save Status'}</span>
+                </button>
+                <button
+                  onClick={() => setIsDrawerOpen(false)}
+                  className="p-1.5 text-stone-400 hover:text-stone-700 rounded-full hover:bg-stone-100"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             {/* Customer & Address Summary */}

@@ -647,11 +647,25 @@ export default function AdminSettingsPage() {
             disabled={saving}
             className="px-8 py-3.5 rounded-full bg-harmony-900 hover:bg-harmony-950 text-white font-bold text-xs uppercase tracking-wider shadow-lg flex items-center gap-2 transition-all disabled:opacity-50"
           >
-            <Save className="w-4 h-4" />
+            <Save className="w-4 h-4 text-gold-400" />
             <span>{saving ? 'Saving...' : 'Save All Settings'}</span>
           </button>
         </div>
       </form>
+
+      {/* Floating Sticky Quick-Save Button */}
+      <div className="fixed bottom-6 right-6 z-40">
+        <button
+          type="button"
+          onClick={(e) => handleSaveSettings(e as any)}
+          disabled={saving}
+          className="px-6 py-3.5 rounded-full bg-harmony-900 hover:bg-harmony-950 text-white font-bold text-xs uppercase tracking-wider shadow-2xl border-2 border-gold-400 flex items-center gap-2 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 backdrop-blur-xs"
+          title="Save all store configurations"
+        >
+          <Save className="w-4 h-4 text-gold-400" />
+          <span>{saving ? 'Saving...' : 'Save Settings'}</span>
+        </button>
+      </div>
 
       {/* Add New Delivery Zone Modal */}
       {isZoneModalOpen && (

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Plus, Edit2, Trash2, Folder, Sparkles, Check, AlertCircle, X, Layers, ArrowRight } from 'lucide-react';
+import { Plus, Edit2, Trash2, Folder, Sparkles, Check, AlertCircle, X, Layers, ArrowRight, Save } from 'lucide-react';
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<any[]>([]);
@@ -254,12 +254,23 @@ export default function AdminCategoriesPage() {
               <h2 className="font-serif font-bold text-xl text-stone-950">
                 {editingCategory.id ? 'Edit Category' : 'Create New Category'}
               </h2>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="p-1.5 text-stone-400 hover:text-stone-700 rounded-full hover:bg-stone-100"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleSaveCategory}
+                  disabled={saving}
+                  className="px-4 py-2 rounded-xl bg-harmony-900 hover:bg-harmony-950 text-white font-bold uppercase tracking-wider text-[11px] disabled:opacity-50 shadow-xs flex items-center gap-1.5 transition-all"
+                >
+                  <Save className="w-3.5 h-3.5 text-gold-400" />
+                  <span>{saving ? 'Saving...' : 'Save Category'}</span>
+                </button>
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="p-1.5 text-stone-400 hover:text-stone-700 rounded-full hover:bg-stone-100"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             {errorMsg && (

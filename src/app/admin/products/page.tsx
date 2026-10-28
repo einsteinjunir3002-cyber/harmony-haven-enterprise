@@ -17,6 +17,7 @@ import {
   Star,
   Layers,
   ExternalLink,
+  Save,
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { compressImageFile } from '@/lib/imageCompression';
@@ -492,12 +493,23 @@ export default function AdminProductsPage() {
               <h2 className="font-serif font-bold text-xl text-stone-950">
                 {editingProduct.id ? 'Edit Product' : 'Create New Product'}
               </h2>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="p-1.5 text-stone-400 hover:text-stone-700 rounded-full hover:bg-stone-100"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleSaveProduct}
+                  disabled={saving}
+                  className="px-4 py-2 rounded-xl bg-harmony-900 hover:bg-harmony-950 text-white font-bold uppercase tracking-wider text-[11px] disabled:opacity-50 shadow-xs flex items-center gap-1.5 transition-all"
+                >
+                  <Save className="w-3.5 h-3.5 text-gold-400" />
+                  <span>{saving ? 'Saving...' : 'Save Product'}</span>
+                </button>
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="p-1.5 text-stone-400 hover:text-stone-700 rounded-full hover:bg-stone-100"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             {errorMsg && (

@@ -23,6 +23,7 @@ import {
   ExternalLink,
   AlertCircle,
   Check,
+  Save,
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { useCart } from '@/context/CartContext';
@@ -662,13 +663,25 @@ export function ProductDetailClient({
                   Edit "{editingForm.name || 'Product'}"
                 </h2>
               </div>
-              <button
-                type="button"
-                onClick={() => setIsEditModalOpen(false)}
-                className="p-1.5 text-stone-400 hover:text-stone-700 rounded-full hover:bg-stone-100"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={(e) => handleSaveProductChanges(e as any)}
+                  disabled={savingEdit}
+                  className="px-4 py-2 rounded-xl bg-harmony-900 hover:bg-harmony-950 text-white font-bold text-xs uppercase tracking-wider shadow-sm flex items-center gap-1.5 transition-all disabled:opacity-50"
+                  title="Save all changes to this product"
+                >
+                  <Save className="w-3.5 h-3.5 text-gold-400" />
+                  <span>{savingEdit ? 'Saving...' : 'Save Product'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsEditModalOpen(false)}
+                  className="p-1.5 text-stone-400 hover:text-stone-700 rounded-full hover:bg-stone-100"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             <form onSubmit={handleSaveProductChanges} className="space-y-6 text-xs">
@@ -853,7 +866,7 @@ export function ProductDetailClient({
                     </p>
                   </div>
 
-                  <div>
+                  <div className="flex items-center gap-2">
                     <input
                       type="file"
                       id="product-detail-photo-upload"
@@ -863,11 +876,22 @@ export function ProductDetailClient({
                     />
                     <label
                       htmlFor="product-detail-photo-upload"
-                      className="cursor-pointer px-3.5 py-2 rounded-xl bg-harmony-900 hover:bg-harmony-950 text-white font-bold text-[11px] uppercase tracking-wider shadow-xs flex items-center gap-1.5 transition-all"
+                      className="cursor-pointer px-3.5 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 font-bold text-[11px] uppercase tracking-wider shadow-xs flex items-center gap-1.5 transition-all"
                     >
-                      <Upload className="w-3.5 h-3.5" />
+                      <Upload className="w-3.5 h-3.5 text-stone-600" />
                       <span>{uploadingImage ? 'Uploading...' : 'Upload Photo'}</span>
                     </label>
+
+                    <button
+                      type="button"
+                      onClick={(e) => handleSaveProductChanges(e as any)}
+                      disabled={savingEdit}
+                      className="px-3.5 py-2 rounded-xl bg-harmony-900 hover:bg-harmony-950 text-white font-bold text-[11px] uppercase tracking-wider shadow-xs flex items-center gap-1.5 transition-all disabled:opacity-50"
+                      title="Save photo gallery changes"
+                    >
+                      <Save className="w-3.5 h-3.5 text-gold-400" />
+                      <span>{savingEdit ? 'Saving...' : 'Save Photos'}</span>
+                    </button>
                   </div>
                 </div>
 
@@ -959,21 +983,27 @@ export function ProductDetailClient({
               </div>
 
               {/* Action Buttons */}
-              <div className="pt-4 border-t border-stone-100 flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsEditModalOpen(false)}
-                  className="px-5 py-2.5 rounded-xl border border-stone-200 text-stone-600 font-bold uppercase tracking-wider text-[11px]"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={savingEdit}
-                  className="px-6 py-2.5 rounded-xl bg-harmony-900 hover:bg-harmony-950 text-white font-bold uppercase tracking-wider text-[11px] disabled:opacity-50 shadow-md transition-all"
-                >
-                  {savingEdit ? 'Saving Changes...' : 'Save Product Changes'}
-                </button>
+              <div className="pt-4 border-t border-stone-100 flex items-center justify-between">
+                <span className="text-[11px] text-stone-400">
+                  Changes update both live customer view and the administrative database.
+                </span>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsEditModalOpen(false)}
+                    className="px-5 py-2.5 rounded-xl border border-stone-200 text-stone-600 font-bold uppercase tracking-wider text-[11px]"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={savingEdit}
+                    className="px-7 py-2.5 rounded-xl bg-harmony-900 hover:bg-harmony-950 text-white font-bold uppercase tracking-wider text-[11px] disabled:opacity-50 shadow-md flex items-center gap-1.5 transition-all"
+                  >
+                    <Save className="w-3.5 h-3.5 text-gold-400" />
+                    <span>{savingEdit ? 'Saving Changes...' : 'Save Product Changes'}</span>
+                  </button>
+                </div>
               </div>
             </form>
           </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Plus, Tag, Edit2, Sparkles, Check, AlertCircle, X } from 'lucide-react';
+import { Plus, Tag, Edit2, Sparkles, Check, AlertCircle, X, Save } from 'lucide-react';
 
 export default function AdminBrandsPage() {
   const [brands, setBrands] = useState<any[]>([]);
@@ -191,12 +191,23 @@ export default function AdminBrandsPage() {
               <h2 className="font-serif font-bold text-xl text-stone-950">
                 {editingBrand.id ? 'Edit Brand Settings' : 'Create New Brand'}
               </h2>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="p-1.5 text-stone-400 hover:text-stone-700 rounded-full hover:bg-stone-100"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleSaveBrand}
+                  disabled={saving}
+                  className="px-4 py-2 rounded-xl bg-harmony-900 hover:bg-harmony-950 text-white font-bold uppercase tracking-wider text-[11px] disabled:opacity-50 shadow-xs flex items-center gap-1.5 transition-all"
+                >
+                  <Save className="w-3.5 h-3.5 text-gold-400" />
+                  <span>{saving ? 'Saving...' : 'Save Brand'}</span>
+                </button>
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="p-1.5 text-stone-400 hover:text-stone-700 rounded-full hover:bg-stone-100"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             {errorMsg && (
