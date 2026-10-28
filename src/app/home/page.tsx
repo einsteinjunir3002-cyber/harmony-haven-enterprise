@@ -74,22 +74,22 @@ export default async function FullHomePage() {
     headline: 'Harmony Haven Enterprise',
     tagline: 'Small Hands, Wide Reach',
     subheadline:
-      'Harmony Haven Enterprise is a growing Ghanaian enterprise building meaningful brands across food, gifting, creativity and lifestyle.',
-    ctaExplore: 'Explore Our Brands',
-    ctaOrder: 'Place an Order',
+      'We make yummy home-cooked Ghanaian food and beautiful gift boxes that bring happiness to you and your loved ones.',
+    ctaExplore: 'See What We Sell',
+    ctaOrder: 'Order Food or Gifts',
   });
 
   const welcomeContent = getBlock('home.welcome', {
-    heading: 'MORE THAN A BUSINESS. A HOME FOR IDEAS.',
+    heading: 'YUMMY FOOD & THOUGHTFUL GIFTS',
     body:
-      "Harmony Haven Enterprise was created to bring different ideas and experiences together under one vision. From nourishing people through food to helping them express what words sometimes cannot say, our brands are built around one simple belief: What we create should add value to people's lives.",
+      "Welcome to Harmony Haven! We love cooking fresh, tasty Ghanaian dishes and making cute, heartfelt gifts that bring smiles to everyone.",
   });
 
   const founderContent = getBlock('about.founder', {
-    role: 'Founder & CEO',
+    role: 'Founder',
     name: 'Alberta Glory',
     biography:
-      'Passionate entrepreneur and creative director leading Harmony Haven Enterprise with a vision to build homegrown Ghanaian brands that resonate globally through culinary delight and expressive gifting.',
+      'Alberta Glory loves cooking tasty meals with Kowah’s Dishes and making special gift packages with 4U Heartlines for families and friends across Ghana.',
     photo: '/images/gallery/alberta-glory-founder.jpg',
   });
 

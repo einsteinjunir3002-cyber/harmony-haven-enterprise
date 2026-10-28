@@ -43,25 +43,25 @@ export default function AdminCustomRequestsPage() {
       {/* Header */}
       <div>
         <span className="text-xs font-bold uppercase tracking-widest text-teal-800 block">
-          4U HEARTLINES Creative Studio
+          4U Heartlines
         </span>
-        <h1 className="font-serif font-bold text-3xl text-stone-950 mt-1">
-          Custom Poem & Gifting Commissions
+        <h1 className="font-serif font-bold text-2xl sm:text-3xl text-stone-950 mt-1">
+          Special Gift Requests
         </h1>
         <p className="text-stone-500 text-xs mt-1">
-          Review personal stories, memories, poem themes, and recipient attachments submitted by clients.
+          Read special stories and messages from customers who want a custom poem or gift box.
         </p>
       </div>
 
       {/* Requests Grid */}
       {loading ? (
-        <div className="p-12 text-center text-xs text-stone-400">Loading custom commissions...</div>
+        <div className="p-12 text-center text-xs text-stone-400">Loading gift requests...</div>
       ) : requests.length === 0 ? (
         <div className="p-12 rounded-3xl bg-white border border-stone-200 text-center space-y-3">
           <Heart className="w-10 h-10 text-stone-300 mx-auto" />
-          <p className="font-serif font-bold text-base text-stone-800">No custom commissions yet</p>
+          <p className="font-serif font-bold text-base text-stone-800">No gift requests yet</p>
           <p className="text-xs text-stone-500 max-w-sm mx-auto">
-            Client requests submitted via the 4U HEARTLINES Personalization Studio will appear here for review.
+            When someone asks for a custom gift or poem, it will show up here.
           </p>
         </div>
       ) : (

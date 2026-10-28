@@ -47,61 +47,61 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (isLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-stone-950 text-gold-400">
-        <p className="text-xs font-bold uppercase tracking-wider">Verifying Admin Access...</p>
+        <p className="text-xs font-bold uppercase tracking-wider">Checking your store access...</p>
       </div>
     );
   }
 
   // Flat nav links matching desktop sidebar exactly
   const navLinks = [
-    { href: '/admin/dashboard', label: 'Dashboard Overview', shortLabel: 'Overview', icon: LayoutDashboard },
-    { href: '/admin/sales', label: 'Sales & Revenue', shortLabel: 'Sales', icon: TrendingUp },
-    { href: '/admin/products', label: 'Products & Photos', shortLabel: 'Products', icon: Package },
-    { href: '/admin/categories', label: 'Categories', shortLabel: 'Categories', icon: Layers },
-    { href: '/admin/inventory', label: 'Inventory Control', shortLabel: 'Inventory', icon: Boxes },
-    { href: '/admin/orders', label: 'Order Management', shortLabel: 'Orders', icon: ShoppingBag },
-    { href: '/admin/customers', label: 'Customer Accounts', shortLabel: 'Customers', icon: Users },
-    { href: '/admin/custom-requests', label: '4U Heartlines Requests', shortLabel: '4U Requests', icon: Heart },
-    { href: '/admin/media', label: 'Sunflower Media Hub', shortLabel: 'Media', icon: ImageIcon },
-    { href: '/admin/brands', label: 'Brand Architecture', shortLabel: 'Brands', icon: Tag },
-    { href: '/admin/settings', label: 'Store Settings & Alerts', shortLabel: 'Settings', icon: Sliders },
-    { href: '/admin/inquiries', label: 'Customer Inquiries', shortLabel: 'Inquiries', icon: Mail },
-    { href: '/admin/audit-logs', label: 'Staff Audit Logs', shortLabel: 'Audit Logs', icon: History },
+    { href: '/admin/dashboard', label: 'Store Overview', shortLabel: 'Home', icon: LayoutDashboard },
+    { href: '/admin/sales', label: 'Money & Sales', shortLabel: 'Sales', icon: TrendingUp },
+    { href: '/admin/products', label: 'Items & Pictures', shortLabel: 'Items', icon: Package },
+    { href: '/admin/categories', label: 'Item Types', shortLabel: 'Types', icon: Layers },
+    { href: '/admin/inventory', label: 'Stock Count', shortLabel: 'Stock', icon: Boxes },
+    { href: '/admin/orders', label: 'Customer Orders', shortLabel: 'Orders', icon: ShoppingBag },
+    { href: '/admin/customers', label: 'Customer List', shortLabel: 'Customers', icon: Users },
+    { href: '/admin/custom-requests', label: 'Special Gift Requests', shortLabel: 'Gifts', icon: Heart },
+    { href: '/admin/media', label: 'Pictures & Videos', shortLabel: 'Photos', icon: ImageIcon },
+    { href: '/admin/brands', label: 'Our Brands', shortLabel: 'Brands', icon: Tag },
+    { href: '/admin/settings', label: 'Store Settings', shortLabel: 'Settings', icon: Sliders },
+    { href: '/admin/inquiries', label: 'Customer Messages', shortLabel: 'Messages', icon: Mail },
+    { href: '/admin/audit-logs', label: 'Activity History', shortLabel: 'History', icon: History },
   ];
 
   // Grouped sections for structured mobile phone drawer
   const mobileNavSections = [
     {
-      category: 'Analytics & Orders',
+      category: 'Money & Orders',
       links: [
-        { href: '/admin/dashboard', label: 'Dashboard Overview', icon: LayoutDashboard },
-        { href: '/admin/sales', label: 'Sales & Revenue', icon: TrendingUp },
-        { href: '/admin/orders', label: 'Order Management', icon: ShoppingBag },
+        { href: '/admin/dashboard', label: 'Store Overview', icon: LayoutDashboard },
+        { href: '/admin/sales', label: 'Money & Sales', icon: TrendingUp },
+        { href: '/admin/orders', label: 'Customer Orders', icon: ShoppingBag },
       ],
     },
     {
-      category: 'Catalog & Warehouse',
+      category: 'Items & Stock',
       links: [
-        { href: '/admin/products', label: 'Products & Photos', icon: Package },
-        { href: '/admin/categories', label: 'Categories', icon: Layers },
-        { href: '/admin/inventory', label: 'Inventory Control', icon: Boxes },
-        { href: '/admin/media', label: 'Sunflower Media Hub', icon: ImageIcon },
+        { href: '/admin/products', label: 'Items & Pictures', icon: Package },
+        { href: '/admin/categories', label: 'Item Types', icon: Layers },
+        { href: '/admin/inventory', label: 'Stock Count', icon: Boxes },
+        { href: '/admin/media', label: 'Pictures & Videos', icon: ImageIcon },
       ],
     },
     {
-      category: 'Clients & Requests',
+      category: 'Customers & Messages',
       links: [
-        { href: '/admin/customers', label: 'Customer Accounts', icon: Users },
-        { href: '/admin/custom-requests', label: '4U Heartlines Requests', icon: Heart },
-        { href: '/admin/inquiries', label: 'Customer Inquiries', icon: Mail },
+        { href: '/admin/customers', label: 'Customer List', icon: Users },
+        { href: '/admin/custom-requests', label: 'Special Gift Requests', icon: Heart },
+        { href: '/admin/inquiries', label: 'Customer Messages', icon: Mail },
       ],
     },
     {
-      category: 'Store & Administration',
+      category: 'Store & Settings',
       links: [
-        { href: '/admin/brands', label: 'Brand Architecture', icon: Tag },
-        { href: '/admin/settings', label: 'Store Settings & Alerts', icon: Sliders },
-        { href: '/admin/audit-logs', label: 'Staff Audit Logs', icon: History },
+        { href: '/admin/brands', label: 'Our Brands', icon: Tag },
+        { href: '/admin/settings', label: 'Store Settings', icon: Sliders },
+        { href: '/admin/audit-logs', label: 'Activity History', icon: History },
       ],
     },
   ];
@@ -125,7 +125,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 HARMONY HAVEN
               </h2>
               <span className="text-[10px] uppercase font-bold text-gold-400 tracking-widest block">
-                Enterprise Admin Hub
+                Store Manager
               </span>
             </div>
           </div>
@@ -157,12 +157,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="p-6 border-t border-harmony-900/80 space-y-4">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-harmony-800 text-gold-400 font-bold text-xs flex items-center justify-center font-serif">
-              {user.name.charAt(0)}
+              {(user?.name || 'A').charAt(0).toUpperCase()}
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-bold text-white truncate">{user.name}</p>
+              <p className="text-xs font-bold text-white truncate">{user?.name || 'Store Manager'}</p>
               <span className="text-[10px] text-gold-400 uppercase font-semibold">
-                {user.role}
+                {user?.role || 'ADMIN'}
               </span>
             </div>
           </div>
@@ -173,7 +173,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               className="flex-1 py-2 px-3 rounded-lg bg-white/5 hover:bg-white/10 text-stone-300 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors"
             >
               <ExternalLink className="w-3.5 h-3.5 text-gold-400" />
-              <span>Storefront</span>
+              <span>Go to Shop</span>
             </Link>
 
             <button
@@ -211,7 +211,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     HARMONY HAVEN
                   </h2>
                   <span className="text-[9px] uppercase font-bold text-gold-400 tracking-widest block">
-                    Enterprise Admin Hub
+                    Store Manager
                   </span>
                 </div>
               </div>
@@ -228,12 +228,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             {/* User Profile Card */}
             <div className="px-5 py-3.5 bg-harmony-900/40 border-b border-harmony-900/60 flex items-center gap-3">
               <div className="w-9 h-9 rounded-full bg-harmony-800 text-gold-300 font-serif font-bold text-sm flex items-center justify-center border border-gold-400/20">
-                {user.name.charAt(0)}
+                {(user?.name || 'A').charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-bold text-white truncate">{user.name}</p>
+                <p className="text-xs font-bold text-white truncate">{user?.name || 'Store Manager'}</p>
                 <span className="inline-block text-[9px] font-bold uppercase tracking-wider text-gold-400 bg-gold-400/10 px-2 py-0.5 rounded-md mt-0.5">
-                  {user.role}
+                  {user?.role || 'ADMIN'}
                 </span>
               </div>
             </div>
@@ -281,7 +281,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 className="w-full py-2.5 px-3 rounded-xl bg-white/5 hover:bg-white/10 text-stone-200 text-xs font-semibold flex items-center justify-center gap-2 transition-colors"
               >
                 <ExternalLink className="w-3.5 h-3.5 text-gold-400" />
-                <span>Open Storefront</span>
+                <span>Go to Shop</span>
               </Link>
 
               <button
@@ -383,7 +383,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             }`}
           >
             <LayoutDashboard className="w-4 h-4" />
-            <span>Overview</span>
+            <span>Home</span>
           </Link>
 
           <Link
@@ -403,7 +403,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             }`}
           >
             <Package className="w-4 h-4" />
-            <span>Products</span>
+            <span>Items</span>
           </Link>
 
           <Link
@@ -413,7 +413,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             }`}
           >
             <Boxes className="w-4 h-4" />
-            <span>Inventory</span>
+            <span>Stock</span>
           </Link>
 
           <button
@@ -421,7 +421,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             className="flex flex-col items-center gap-1 py-1 px-2 rounded-lg text-[10px] font-semibold text-gold-400 active:scale-95 transition-transform"
           >
             <Menu className="w-4 h-4" />
-            <span>All Hubs</span>
+            <span>All Pages</span>
           </button>
         </div>
       </main>

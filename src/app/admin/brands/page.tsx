@@ -92,13 +92,13 @@ export default function AdminBrandsPage() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <span className="text-xs font-bold uppercase tracking-widest text-gold-700 block">
-            Enterprise Brand Hierarchy
+            Our Shops & Brands
           </span>
-          <h1 className="font-serif font-bold text-3xl text-stone-950 mt-1">
-            Brand Management
+          <h1 className="font-serif font-bold text-2xl sm:text-3xl text-stone-950 mt-1">
+            Our Brands
           </h1>
           <p className="text-stone-500 text-xs mt-1">
-            Scalable multi-brand architecture. Add new sister brands anytime without code modification.
+            Manage your brands (like Kowah&apos;s Dishes and 4U Heartlines) or add a new brand anytime.
           </p>
         </div>
 
@@ -107,7 +107,7 @@ export default function AdminBrandsPage() {
           className="px-6 py-3 rounded-full bg-harmony-900 hover:bg-harmony-950 text-white font-bold text-xs uppercase tracking-wider shadow-md flex items-center gap-2 transition-all"
         >
           <Plus className="w-4 h-4" />
-          <span>Add New Sister Brand</span>
+          <span>Add a New Brand</span>
         </button>
       </div>
 

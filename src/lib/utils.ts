@@ -6,12 +6,17 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatCurrency(amount: number, currency = "GHS"): string {
-  return new Intl.NumberFormat("en-GH", {
-    style: "currency",
-    currency: currency,
-    minimumFractionDigits: 2,
-  }).format(amount).replace("GHS", "GH₵");
+export function formatCurrency(amount: number | string | null | undefined, currency = "GHS"): string {
+  const num = typeof amount === "number" ? amount : Number(amount) || 0;
+  try {
+    return new Intl.NumberFormat("en-GH", {
+      style: "currency",
+      currency: currency,
+      minimumFractionDigits: 2,
+    }).format(num).replace("GHS", "GH₵");
+  } catch {
+    return `GH₵${num.toFixed(2)}`;
+  }
 }
 
 export function generateOrderNumber(): string {
@@ -30,9 +35,16 @@ export function slugify(text: string): string {
     .replace(/\-\-+/g, "-");
 }
 
-export function formatDate(date: Date | string): string {
-  return new Intl.DateTimeFormat("en-GB", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(date));
+export function formatDate(date: Date | string | null | undefined): string {
+  if (!date) return "—";
+  try {
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return "—";
+    return new Intl.DateTimeFormat("en-GB", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }).format(d);
+  } catch {
+    return "—";
+  }
 }

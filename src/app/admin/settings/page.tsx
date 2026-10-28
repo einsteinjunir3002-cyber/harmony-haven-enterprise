@@ -273,7 +273,7 @@ export default function AdminSettingsPage() {
   if (loading) {
     return (
       <div className="py-20 text-center text-xs font-bold uppercase tracking-wider text-stone-400">
-        Loading enterprise settings...
+        Loading store settings...
       </div>
     );
   }
@@ -284,13 +284,13 @@ export default function AdminSettingsPage() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <span className="text-xs font-bold uppercase tracking-widest text-gold-700 block">
-            System Control & Operations
+            Store Settings
           </span>
-          <h1 className="font-serif font-bold text-3xl text-stone-950 mt-1">
-            Store Settings & Alerts
+          <h1 className="font-serif font-bold text-2xl sm:text-3xl text-stone-950 mt-1">
+            Store Settings
           </h1>
           <p className="text-stone-500 text-xs mt-1">
-            Configure contact lines, delivery zones, announcement banners, notification toggles, and brand content.
+            Change your phone numbers, delivery towns, prices, and banner message.
           </p>
         </div>
 
@@ -300,7 +300,7 @@ export default function AdminSettingsPage() {
             className="px-4 py-2.5 rounded-full bg-white hover:bg-stone-50 text-stone-700 border border-stone-200 font-bold text-xs uppercase tracking-wider shadow-xs flex items-center gap-2 transition-all"
           >
             <ExternalLink className="w-3.5 h-3.5 text-gold-600" />
-            <span>View Storefront</span>
+            <span>Go to Shop</span>
           </Link>
 
           <button
@@ -329,8 +329,8 @@ export default function AdminSettingsPage() {
               <Phone className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="font-serif font-bold text-xl text-stone-950">Store Contact Channels</h2>
-              <p className="text-xs text-stone-400">Customer touchpoints displayed on storefront and order confirmations</p>
+              <h2 className="font-serif font-bold text-xl text-stone-950">Phone Numbers & Contact</h2>
+              <p className="text-xs text-stone-400">Phone numbers shown to customers on the website</p>
             </div>
           </div>
 

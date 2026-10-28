@@ -107,13 +107,13 @@ export default function AdminCustomersPage() {
       {/* Header */}
       <div>
         <span className="text-xs font-bold uppercase tracking-widest text-gold-700 block">
-          Clientele & Stakeholders
+          Customers
         </span>
-        <h1 className="font-serif font-bold text-3xl text-stone-950 mt-1">
-          Customer Management
+        <h1 className="font-serif font-bold text-2xl sm:text-3xl text-stone-950 mt-1">
+          Customer List
         </h1>
         <p className="text-stone-500 text-xs mt-1">
-          View registered customer accounts, monitor verified purchase history, manage access roles, and audit account status.
+          See all customer accounts, how much they bought, and manage staff access.
         </p>
       </div>
 
@@ -121,7 +121,7 @@ export default function AdminCustomersPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white p-5 rounded-3xl border border-stone-200 shadow-xs">
           <div className="flex items-center justify-between text-stone-500">
-            <span className="text-[11px] font-bold uppercase tracking-wider">Registered Accounts</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider">All Accounts</span>
             <Users className="w-4 h-4 text-harmony-900" />
           </div>
           <p className="font-serif font-bold text-2xl text-stone-950 mt-2">{metrics.totalUsers}</p>
@@ -130,7 +130,7 @@ export default function AdminCustomersPage() {
 
         <div className="bg-white p-5 rounded-3xl border border-stone-200 shadow-xs">
           <div className="flex items-center justify-between text-stone-500">
-            <span className="text-[11px] font-bold uppercase tracking-wider">Active Customers</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider">Active Buyers</span>
             <CheckCircle2 className="w-4 h-4 text-emerald-600" />
           </div>
           <p className="font-serif font-bold text-2xl text-stone-950 mt-2">{metrics.activeCustomers}</p>
@@ -139,22 +139,22 @@ export default function AdminCustomersPage() {
 
         <div className="bg-white p-5 rounded-3xl border border-stone-200 shadow-xs">
           <div className="flex items-center justify-between text-stone-500">
-            <span className="text-[11px] font-bold uppercase tracking-wider">Customer Spend</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider">Money Spent</span>
             <DollarSign className="w-4 h-4 text-gold-600" />
           </div>
           <p className="font-serif font-bold text-2xl text-harmony-950 mt-2">
             {formatCurrency(metrics.totalLifetimeSpend)}
           </p>
-          <span className="text-[10px] text-stone-400">Verified paid transactions</span>
+          <span className="text-[10px] text-stone-400">Total paid orders</span>
         </div>
 
         <div className="bg-white p-5 rounded-3xl border border-stone-200 shadow-xs">
           <div className="flex items-center justify-between text-stone-500">
-            <span className="text-[11px] font-bold uppercase tracking-wider">Shopper Base</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider">Total Shoppers</span>
             <ShoppingBag className="w-4 h-4 text-teal-600" />
           </div>
           <p className="font-serif font-bold text-2xl text-stone-950 mt-2">{metrics.totalCustomers}</p>
-          <span className="text-[10px] text-stone-400">Pure retail consumers</span>
+          <span className="text-[10px] text-stone-400">Regular customers</span>
         </div>
       </div>
 

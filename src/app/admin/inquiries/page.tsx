@@ -42,13 +42,13 @@ export default function AdminInquiriesPage() {
       {/* Header */}
       <div>
         <span className="text-xs font-bold uppercase tracking-widest text-gold-700 block">
-          Communications
+          Messages
         </span>
-        <h1 className="font-serif font-bold text-3xl text-stone-950 mt-1">
-          Customer & Partnership Inquiries
+        <h1 className="font-serif font-bold text-2xl sm:text-3xl text-stone-950 mt-1">
+          Customer Messages
         </h1>
         <p className="text-stone-500 text-xs mt-1">
-          Messages submitted from the public contact and corporate partnership inquiry forms.
+          Messages sent by people from the contact page or partnership page.
         </p>
       </div>
 
@@ -58,9 +58,9 @@ export default function AdminInquiriesPage() {
       ) : inquiries.length === 0 ? (
         <div className="p-12 rounded-3xl bg-white border border-stone-200 text-center space-y-3">
           <Mail className="w-10 h-10 text-stone-300 mx-auto" />
-          <p className="font-serif font-bold text-base text-stone-800">No inquiries yet</p>
+          <p className="font-serif font-bold text-base text-stone-800">No messages yet</p>
           <p className="text-xs text-stone-500 max-w-sm mx-auto">
-            Submissions through the contact and partnerships forms will appear here.
+            When someone sends a message from your website, you will see it here.
           </p>
         </div>
       ) : (

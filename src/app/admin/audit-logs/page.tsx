@@ -23,32 +23,32 @@ export default function AdminAuditLogsPage() {
       {/* Header */}
       <div>
         <span className="text-xs font-bold uppercase tracking-widest text-gold-700 block">
-          Security & Compliance
+          Activity Record
         </span>
-        <h1 className="font-serif font-bold text-3xl text-stone-950 mt-1">
-          Administrative Audit Trail
+        <h1 className="font-serif font-bold text-2xl sm:text-3xl text-stone-950 mt-1">
+          Who Did What (History)
         </h1>
         <p className="text-stone-500 text-xs mt-1">
-          Tamper-evident logs of administrative actions, price adjustments, and status progressions.
+          A clear list showing what changes staff or managers made in the store.
         </p>
       </div>
 
       {/* Logs Table */}
       <div className="bg-white rounded-3xl border border-stone-200 shadow-xs overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center text-xs text-stone-400">Loading audit records...</div>
+          <div className="p-12 text-center text-xs text-stone-400">Loading history...</div>
         ) : logs.length === 0 ? (
-          <div className="p-12 text-center text-xs text-stone-400">No administrative events recorded yet.</div>
+          <div className="p-12 text-center text-xs text-stone-400">No activity recorded yet.</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead className="border-b border-stone-200 bg-stone-50 text-stone-500 uppercase tracking-wider font-bold">
                 <tr>
-                  <th className="py-3 px-6">Timestamp</th>
-                  <th className="py-3 px-4">Actor</th>
-                  <th className="py-3 px-4">Action</th>
-                  <th className="py-3 px-4">Entity</th>
-                  <th className="py-3 px-4">Entity ID</th>
+                  <th className="py-3 px-6">When</th>
+                  <th className="py-3 px-4">Who Did It</th>
+                  <th className="py-3 px-4">What They Did</th>
+                  <th className="py-3 px-4">Where</th>
+                  <th className="py-3 px-4">ID</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100 font-mono text-[11px]">

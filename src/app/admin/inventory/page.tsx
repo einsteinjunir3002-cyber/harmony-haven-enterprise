@@ -209,13 +209,13 @@ export default function AdminInventoryPage() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <span className="text-xs font-bold uppercase tracking-widest text-gold-700 block">
-            Stock Control & Auditing
+            Stock Count
           </span>
-          <h1 className="font-serif font-bold text-3xl text-stone-950 mt-1">
-            Inventory Management
+          <h1 className="font-serif font-bold text-2xl sm:text-3xl text-stone-950 mt-1">
+            Stock (How Many Left)
           </h1>
           <p className="text-stone-500 text-xs mt-1">
-            Real-time warehouse stock tracking, low-inventory notifications, and instant quantity adjustments.
+            See how many items you have left, change stock numbers, and see when items are running out.
           </p>
         </div>
 
@@ -234,8 +234,8 @@ export default function AdminInventoryPage() {
               {savingAll
                 ? 'Saving Changes...'
                 : dirtyEntries.length > 0
-                ? `Save All Changes (${dirtyEntries.length} Pending)`
-                : 'Save All Stock Levels'}
+                ? `Save All Changes (${dirtyEntries.length} Items)`
+                : 'Save Stock Changes'}
             </span>
           </button>
         </div>
@@ -259,11 +259,11 @@ export default function AdminInventoryPage() {
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider opacity-80">Tracked SKUs</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider opacity-80">All Items</span>
             <Boxes className="w-4 h-4 opacity-80" />
           </div>
           <p className="font-serif font-bold text-2xl mt-2">{summary.totalTracked}</p>
-          <span className="text-[10px] opacity-70">Active inventory products</span>
+          <span className="text-[10px] opacity-70">Total items tracked</span>
         </div>
 
         <div

@@ -118,13 +118,13 @@ export default function AdminCategoriesPage() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <span className="text-xs font-bold uppercase tracking-widest text-gold-700 block">
-            Catalog Structure
+            Item Types
           </span>
-          <h1 className="font-serif font-bold text-3xl text-stone-950 mt-1">
-            Category Management
+          <h1 className="font-serif font-bold text-2xl sm:text-3xl text-stone-950 mt-1">
+            Item Types & Groups
           </h1>
           <p className="text-stone-500 text-xs mt-1">
-            Add new categories, rename or edit descriptions, adjust display order, and organize offerings under each brand.
+            Group your items (like Soups, Gift Boxes, Cards) so buyers find them easily.
           </p>
         </div>
 
@@ -133,7 +133,7 @@ export default function AdminCategoriesPage() {
           className="px-6 py-3 rounded-full bg-harmony-900 hover:bg-harmony-950 text-white font-bold text-xs uppercase tracking-wider shadow-md flex items-center gap-2 transition-all"
         >
           <Plus className="w-4 h-4" />
-          <span>Add New Category</span>
+          <span>Add New Item Type</span>
         </button>
       </div>
 

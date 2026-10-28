@@ -313,13 +313,13 @@ export default function AdminProductsPage() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <span className="text-xs font-bold uppercase tracking-widest text-gold-700 block">
-            Catalog Management
+            Items in Your Shop
           </span>
-          <h1 className="font-serif font-bold text-3xl text-stone-950 mt-1">
-            Products & Variants
+          <h1 className="font-serif font-bold text-2xl sm:text-3xl text-stone-950 mt-1">
+            Items & Pictures
           </h1>
           <p className="text-stone-500 text-xs mt-1">
-            Create, edit photos, assign categories, adjust prices, manage inventory and attach options.
+            Add new items, upload photos, change prices, and set stock.
           </p>
         </div>
 
@@ -329,7 +329,7 @@ export default function AdminProductsPage() {
             className="px-4 py-2.5 rounded-full bg-white hover:bg-stone-50 text-stone-700 border border-stone-200 font-bold text-xs uppercase tracking-wider shadow-xs flex items-center gap-2 transition-all"
           >
             <ExternalLink className="w-3.5 h-3.5 text-gold-600" />
-            <span>View Storefront</span>
+            <span>Go to Shop</span>
           </Link>
 
           <button
@@ -337,7 +337,7 @@ export default function AdminProductsPage() {
             className="px-6 py-3 rounded-full bg-harmony-900 hover:bg-harmony-950 text-white font-bold text-xs uppercase tracking-wider shadow-md flex items-center gap-2 transition-all"
           >
             <Plus className="w-4 h-4" />
-            <span>Add New Product</span>
+            <span>Add New Item</span>
           </button>
         </div>
       </div>
@@ -356,7 +356,7 @@ export default function AdminProductsPage() {
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Filter products by name, brand, or category..."
+          placeholder="Search items by name, brand, or type..."
           className="w-full text-xs focus:outline-none bg-transparent"
         />
       </div>
@@ -364,17 +364,17 @@ export default function AdminProductsPage() {
       {/* Products Table */}
       <div className="bg-white rounded-3xl border border-stone-200 shadow-xs overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center text-xs text-stone-400">Loading catalog...</div>
+          <div className="p-12 text-center text-xs text-stone-400">Loading items...</div>
         ) : filteredProducts.length === 0 ? (
-          <div className="p-12 text-center text-xs text-stone-400">No products found.</div>
+          <div className="p-12 text-center text-xs text-stone-400">No items found.</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead className="border-b border-stone-200 bg-stone-50 text-stone-500 uppercase tracking-wider font-bold">
                 <tr>
-                  <th className="py-3 px-6">Product</th>
+                  <th className="py-3 px-6">Item</th>
                   <th className="py-3 px-4">Brand</th>
-                  <th className="py-3 px-4">Category</th>
+                  <th className="py-3 px-4">Type</th>
                   <th className="py-3 px-4">Price</th>
                   <th className="py-3 px-4">Stock</th>
                   <th className="py-3 px-4">Type</th>

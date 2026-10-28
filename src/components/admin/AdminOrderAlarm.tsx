@@ -187,12 +187,16 @@ export function AdminOrderAlarm() {
     } catch {}
 
     // Check browser notification permission state
-    if (typeof window !== 'undefined' && 'Notification' in window) {
-      if (Notification.permission === 'granted') {
-        setSoundEnabled(true);
-      } else {
-        setAudioNeedsInteraction(true);
+    try {
+      if (typeof window !== 'undefined' && 'Notification' in window && window.Notification) {
+        if (Notification.permission === 'granted') {
+          setSoundEnabled(true);
+        } else {
+          setAudioNeedsInteraction(true);
+        }
       }
+    } catch {
+      // Notification API not available
     }
   }, []);
 
@@ -260,11 +264,11 @@ export function AdminOrderAlarm() {
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
           </span>
           <span className="font-semibold text-stone-200">
-            Order Dispatch Monitor Active
+            Order Alert Bell is ON
           </span>
           <span className="hidden sm:inline text-stone-500">|</span>
           <span className="hidden sm:inline text-stone-400">
-            Real-time audio alert triggers when customer places an order
+            The bell rings out loud when a customer buys something
           </span>
         </div>
 
@@ -275,7 +279,7 @@ export function AdminOrderAlarm() {
               className="px-2.5 py-1 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-lg hover:bg-amber-500/30 transition-colors font-medium flex items-center gap-1.5 animate-pulse"
             >
               <BellRing className="w-3.5 h-3.5" />
-              <span>Enable Sound Alerts</span>
+              <span>Turn On Sound</span>
             </button>
           )}
 
@@ -290,7 +294,7 @@ export function AdminOrderAlarm() {
             ) : (
               <Volume2 className="w-3.5 h-3.5 text-gold-400" />
             )}
-            <span>{audioTesting ? 'Playing Alarm Siren...' : 'Test Alarm Sound'}</span>
+            <span>{audioTesting ? 'Playing Bell Sound...' : 'Test Bell Sound'}</span>
           </button>
         </div>
       </div>
@@ -305,10 +309,10 @@ export function AdminOrderAlarm() {
                 <BellRing className="w-9 h-9" />
               </div>
               <span className="text-[11px] font-bold uppercase tracking-widest bg-white/20 px-3 py-1 rounded-full inline-block mb-1">
-                Immediate Action Required
+                New Customer Order
               </span>
               <h2 className="font-serif font-black text-2xl sm:text-3xl tracking-tight">
-                NEW ORDER RECEIVED!
+                NEW ORDER JUST CAME IN!
               </h2>
               <p className="text-white/90 text-sm mt-1 font-mono font-bold">
                 {activeAlert.orderNumber}
@@ -345,17 +349,17 @@ export function AdminOrderAlarm() {
               {/* Payment Mode Highlight */}
               <div className="p-4 rounded-2xl border-2 border-dashed border-amber-400 bg-amber-50/70 space-y-1 text-xs text-amber-900">
                 <div className="flex items-center justify-between font-bold">
-                  <span>Payment Arrangement:</span>
+                  <span>How Customer Is Paying:</span>
                   <span className="px-2.5 py-0.5 rounded-full bg-amber-200 text-amber-900 uppercase font-black text-[10px]">
                     {activeAlert.paymentStatus === 'PAY_ON_DELIVERY'
-                      ? 'Payment on Delivery'
-                      : 'Paid Before Delivery'}
+                      ? 'Pay on Delivery'
+                      : 'Pay Before Delivery'}
                   </span>
                 </div>
                 <p className="text-[11px] text-amber-800 leading-relaxed pt-1">
                   {activeAlert.paymentStatus === 'PAY_ON_DELIVERY'
-                    ? 'Customer will pay dispatch rider via Mobile Money upon arrival of delivery.'
-                    : 'Customer selected pay before delivery via Mobile Money.'}
+                    ? 'The customer will pay the delivery rider with MoMo when the package arrives.'
+                    : 'The customer chose to send MoMo payment before the order is sent.'}
                 </p>
                 {activeAlert.internalNotes && (
                   <p className="text-[10px] text-amber-700 pt-1 font-mono">
@@ -372,7 +376,7 @@ export function AdminOrderAlarm() {
                   className="w-full py-3.5 bg-harmony-900 hover:bg-harmony-950 text-white rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition-all"
                 >
                   <ShoppingBag className="w-4 h-4 text-gold-400" />
-                  <span>Open Orders & Dispatch</span>
+                  <span>See Order Details</span>
                 </Link>
 
                 <button
@@ -380,7 +384,7 @@ export function AdminOrderAlarm() {
                   className="w-full sm:w-auto px-6 py-3.5 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-colors"
                 >
                   {isPlayingSound ? <VolumeX className="w-4 h-4 text-rose-600" /> : <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
-                  <span>Mute & Acknowledge</span>
+                  <span>Stop Sound (I Saw It)</span>
                 </button>
               </div>
             </div>

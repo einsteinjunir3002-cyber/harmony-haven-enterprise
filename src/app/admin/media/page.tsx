@@ -221,13 +221,13 @@ export default function SunflowerMediaPage() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <span className="text-xs font-bold uppercase tracking-widest text-gold-700 block">
-            Central Media Repository
+            Photos & Videos
           </span>
-          <h1 className="font-serif font-bold text-3xl text-stone-950 mt-1">
-            Sunflower Media Hub
+          <h1 className="font-serif font-bold text-2xl sm:text-3xl text-stone-950 mt-1">
+            Pictures & Videos
           </h1>
           <p className="text-stone-500 text-xs mt-1">
-            Upload photos and videos in any format. Preview, copy URLs, and attach assets to products.
+            Upload pictures and videos of your dishes and gifts to use in your shop.
           </p>
         </div>
 
