@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET() {
   try {
     await requireAuth('STAFF');
@@ -20,15 +23,24 @@ export async function GET() {
     const lowStock = products.filter((p) => p.trackInventory && p.stockQuantity > 0 && p.stockQuantity <= 10).length;
     const inStock = products.filter((p) => p.trackInventory && p.stockQuantity > 10).length;
 
-    return NextResponse.json({
-      products,
-      summary: {
-        totalTracked,
-        inStock,
-        lowStock,
-        outOfStock,
+    return NextResponse.json(
+      {
+        products,
+        summary: {
+          totalTracked,
+          inStock,
+          lowStock,
+          outOfStock,
+        },
       },
-    });
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+        },
+      }
+    );
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Unauthorized' }, { status: 403 });
   }

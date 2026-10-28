@@ -29,7 +29,10 @@ export default function AdminInventoryPage() {
 
   const fetchInventory = async () => {
     try {
-      const res = await fetch('/api/admin/inventory');
+      const res = await fetch(`/api/admin/inventory?_t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' },
+      });
       const data = await res.json();
       if (data.products) setProducts(data.products);
       if (data.summary) setSummary(data.summary);

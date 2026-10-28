@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET() {
   try {
     const [contentBlocks, settings, deliveryZones] = await Promise.all([
@@ -10,7 +13,16 @@ export async function GET() {
       prisma.deliveryZone.findMany({ orderBy: { fee: 'asc' } }),
     ]);
 
-    return NextResponse.json({ contentBlocks, settings, deliveryZones });
+    return NextResponse.json(
+      { contentBlocks, settings, deliveryZones },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+        },
+      }
+    );
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch settings' }, { status: 500 });
   }

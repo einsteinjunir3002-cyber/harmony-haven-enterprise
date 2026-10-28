@@ -3,6 +3,9 @@ import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { slugify } from '@/lib/utils';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET() {
   try {
     await requireAuth('STAFF');
@@ -13,7 +16,16 @@ export async function GET() {
       },
       orderBy: { sortOrder: 'asc' },
     });
-    return NextResponse.json({ brands });
+    return NextResponse.json(
+      { brands },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+        },
+      }
+    );
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Unauthorized' }, { status: 403 });
   }

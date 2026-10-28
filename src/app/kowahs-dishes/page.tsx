@@ -152,6 +152,39 @@ export default async function KowahsDishesPage() {
               </div>
             </div>
           ))}
+
+          {/* Uncategorized or New Offerings */}
+          {(() => {
+            const categorizedIds = new Set(
+              (brand.categories || []).flatMap((c: any) => (c.products || []).map((p: any) => p.id))
+            );
+            const uncategorized = (brand.products || []).filter((p: any) => !categorizedIds.has(p.id));
+            if (uncategorized.length === 0) return null;
+
+            return (
+              <div className="space-y-6">
+                <div className="border-b border-kowah-200 pb-4 flex items-end justify-between">
+                  <div>
+                    <h3 className="font-serif font-bold text-2xl text-kowah-950">
+                      Special Additions & New Menu Offerings
+                    </h3>
+                    <p className="text-xs text-stone-500 mt-1">
+                      Fresh creations and dishes freshly added to Kowah&apos;s kitchen.
+                    </p>
+                  </div>
+                  <span className="text-xs font-bold text-gold-700 bg-gold-100 px-3 py-1 rounded-full">
+                    {uncategorized.length} {uncategorized.length === 1 ? 'item' : 'items'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {uncategorized.map((product: any) => (
+                    <ProductCard key={product.id} product={product as any} />
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
         </div>
       </section>
 

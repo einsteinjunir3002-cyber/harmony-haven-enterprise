@@ -25,10 +25,21 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-40 w-full bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-b border-stone-200/80 dark:border-stone-800 shadow-xs transition-colors">
       {/* Top corporate notice bar */}
-      <div className="bg-harmony-900 text-gold-200 text-xs py-1.5 px-4 text-center font-medium tracking-wide flex items-center justify-center gap-2">
-        <Sparkles className="w-3.5 h-3.5 text-gold-400" />
-        <span>HARMONY HAVEN ENTERPRISE — Small Hands, Wide Reach</span>
-        <span className="hidden md:inline">| Delivery Across Ghana</span>
+      <div className="bg-harmony-900 text-gold-200 text-xs py-1.5 px-4 font-medium tracking-wide flex items-center justify-between">
+        <div className="flex items-center gap-2 mx-auto">
+          <Sparkles className="w-3.5 h-3.5 text-gold-400" />
+          <span>HARMONY HAVEN ENTERPRISE — Small Hands, Wide Reach</span>
+          <span className="hidden md:inline">| Delivery Across Ghana</span>
+        </div>
+        {user && (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN' || user.role === 'STAFF') && (
+          <Link
+            href="/admin/dashboard"
+            className="flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-gold-400 hover:bg-gold-300 text-harmony-950 font-bold text-[11px] shadow-xs transition-colors shrink-0"
+          >
+            <Shield className="w-3 h-3" />
+            <span>Admin Portal</span>
+          </Link>
+        )}
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -296,6 +307,17 @@ export function Navbar() {
               <span>{user ? `Account (${user.name})` : 'Sign In / Register'}</span>
             </Link>
           </nav>
+
+          {user && (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN' || user.role === 'STAFF') && (
+            <Link
+              href="/admin/dashboard"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full text-center py-2.5 bg-gold-400 text-harmony-950 rounded-xl font-bold text-xs tracking-wider uppercase shadow-xs flex items-center justify-center gap-2 mb-2"
+            >
+              <Shield className="w-4 h-4" />
+              <span>Admin Portal</span>
+            </Link>
+          )}
 
           <Link
             href="/order"

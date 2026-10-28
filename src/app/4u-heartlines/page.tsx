@@ -23,6 +23,10 @@ export default async function HeartlinesPage() {
           },
           orderBy: { sortOrder: 'asc' },
         },
+        products: {
+          where: { active: true },
+          include: { brand: true, category: true, variants: true },
+        },
       },
     });
   } catch (err) {
@@ -35,6 +39,7 @@ export default async function HeartlinesPage() {
       tagline: 'When Words Fall Short, We Give Them Wings.',
       description: 'Handcrafted bespoke poems, elegant glee boxes, framed citation candles, and bespoke gifts designed to touch souls and seal unforgettable memories.',
       categories: [],
+      products: [],
     };
   }
 
@@ -133,6 +138,39 @@ export default async function HeartlinesPage() {
               </div>
             </div>
           ))}
+
+          {/* Uncategorized or New Offerings */}
+          {(() => {
+            const categorizedIds = new Set(
+              (brand.categories || []).flatMap((c: any) => (c.products || []).map((p: any) => p.id))
+            );
+            const uncategorized = (brand.products || []).filter((p: any) => !categorizedIds.has(p.id));
+            if (uncategorized.length === 0) return null;
+
+            return (
+              <div className="space-y-6">
+                <div className="border-b border-teal-200 pb-4 flex items-end justify-between">
+                  <div>
+                    <h3 className="font-serif font-bold text-2xl text-harmony-950">
+                      Bespoke Offerings & New Curations
+                    </h3>
+                    <p className="text-xs text-stone-500 mt-1">
+                      Fresh gifting experiences and literary treasures crafted with heart.
+                    </p>
+                  </div>
+                  <span className="text-xs font-bold text-teal-800 bg-teal-100 px-3 py-1 rounded-full">
+                    {uncategorized.length} {uncategorized.length === 1 ? 'offering' : 'offerings'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {uncategorized.map((product: any) => (
+                    <ProductCard key={product.id} product={product as any} />
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
         </div>
       </section>
 

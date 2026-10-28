@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import {
   Plus,
   Edit2,
@@ -15,6 +16,7 @@ import {
   Image as ImageIcon,
   Star,
   Layers,
+  ExternalLink,
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { compressImageFile } from '@/lib/imageCompression';
@@ -34,10 +36,20 @@ export default function AdminProductsPage() {
 
   const fetchProducts = async () => {
     try {
+      const t = Date.now();
       const [prodRes, brandRes, catRes] = await Promise.all([
-        fetch('/api/admin/products'),
-        fetch('/api/admin/brands'),
-        fetch('/api/admin/categories'),
+        fetch(`/api/admin/products?_t=${t}`, {
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' },
+        }),
+        fetch(`/api/admin/brands?_t=${t}`, {
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' },
+        }),
+        fetch(`/api/admin/categories?_t=${t}`, {
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' },
+        }),
       ]);
       const prodData = await prodRes.json();
       const brandData = await brandRes.json();
@@ -71,7 +83,7 @@ export default function AdminProductsPage() {
       compareAtPrice: '',
       type: 'PHYSICAL_PRODUCT',
       active: true,
-      featured: false,
+      featured: true,
       stockQuantity: 100,
       images: ['/images/gallery/WhatsApp Image 2026-09-03 at 10.20.31 PM.jpeg'],
       variants: [],
@@ -246,7 +258,7 @@ export default function AdminProductsPage() {
       if (!res.ok) throw new Error(data.error || 'Failed to save product');
 
       setIsModalOpen(false);
-      fetchProducts();
+      await fetchProducts();
     } catch (err: any) {
       setErrorMsg(err.message || 'Error saving product');
     } finally {
@@ -258,7 +270,7 @@ export default function AdminProductsPage() {
     if (!confirm('Are you sure you want to delete this product?')) return;
     try {
       await fetch(`/api/admin/products?id=${id}`, { method: 'DELETE' });
-      fetchProducts();
+      await fetchProducts();
     } catch (e) {
       console.error(e);
     }
@@ -291,13 +303,23 @@ export default function AdminProductsPage() {
           </p>
         </div>
 
-        <button
-          onClick={handleOpenCreate}
-          className="px-6 py-3 rounded-full bg-harmony-900 hover:bg-harmony-950 text-white font-bold text-xs uppercase tracking-wider shadow-md flex items-center gap-2 transition-all"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add New Product</span>
-        </button>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/home"
+            className="px-4 py-2.5 rounded-full bg-white hover:bg-stone-50 text-stone-700 border border-stone-200 font-bold text-xs uppercase tracking-wider shadow-xs flex items-center gap-2 transition-all"
+          >
+            <ExternalLink className="w-3.5 h-3.5 text-gold-600" />
+            <span>View Storefront</span>
+          </Link>
+
+          <button
+            onClick={handleOpenCreate}
+            className="px-6 py-3 rounded-full bg-harmony-900 hover:bg-harmony-950 text-white font-bold text-xs uppercase tracking-wider shadow-md flex items-center gap-2 transition-all"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add New Product</span>
+          </button>
+        </div>
       </div>
 
       {/* Search Input */}

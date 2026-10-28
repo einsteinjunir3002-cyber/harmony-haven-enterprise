@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import {
   Sliders,
   Save,
@@ -17,6 +18,7 @@ import {
   Trash2,
   X,
   Volume2,
+  ExternalLink,
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 
@@ -58,7 +60,10 @@ export default function AdminSettingsPage() {
 
   const fetchSettings = async () => {
     try {
-      const res = await fetch('/api/admin/settings');
+      const res = await fetch(`/api/admin/settings?_t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' },
+      });
       const data = await res.json();
 
       if (data.contentBlocks) {
@@ -289,14 +294,24 @@ export default function AdminSettingsPage() {
           </p>
         </div>
 
-        <button
-          onClick={handleSaveSettings}
-          disabled={saving}
-          className="px-6 py-3 rounded-full bg-harmony-900 hover:bg-harmony-950 text-white font-bold text-xs uppercase tracking-wider shadow-md flex items-center gap-2 transition-all disabled:opacity-50"
-        >
-          <Save className="w-4 h-4" />
-          <span>{saving ? 'Saving...' : 'Save All Settings'}</span>
-        </button>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/home"
+            className="px-4 py-2.5 rounded-full bg-white hover:bg-stone-50 text-stone-700 border border-stone-200 font-bold text-xs uppercase tracking-wider shadow-xs flex items-center gap-2 transition-all"
+          >
+            <ExternalLink className="w-3.5 h-3.5 text-gold-600" />
+            <span>View Storefront</span>
+          </Link>
+
+          <button
+            onClick={handleSaveSettings}
+            disabled={saving}
+            className="px-6 py-3 rounded-full bg-harmony-900 hover:bg-harmony-950 text-white font-bold text-xs uppercase tracking-wider shadow-md flex items-center gap-2 transition-all disabled:opacity-50"
+          >
+            <Save className="w-4 h-4" />
+            <span>{saving ? 'Saving...' : 'Save All Settings'}</span>
+          </button>
+        </div>
       </div>
 
       {message && (

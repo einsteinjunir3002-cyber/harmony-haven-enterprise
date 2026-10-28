@@ -36,14 +36,14 @@ export default async function FullHomePage() {
         orderBy: { sortOrder: 'asc' },
       }),
       prisma.product.findMany({
-        where: { active: true, featured: true },
-        take: 6,
+        where: { active: true },
+        take: 8,
         include: {
           brand: true,
           category: true,
           variants: true,
         },
-        orderBy: { sortOrder: 'asc' },
+        orderBy: [{ featured: 'desc' }, { sortOrder: 'asc' }, { createdAt: 'desc' }],
       }),
       prisma.contentBlock.findMany(),
       prisma.media.findMany({
