@@ -10,7 +10,8 @@
     "start": "next start",
     "test": "tsx scripts/test-platform.ts",
     "db:seed": "tsx prisma/seed.ts",
-    "db:push": "prisma db push"
+    "db:push": "prisma db push",
+    "db:supabase": "node scripts/setup-supabase.js"
   },
   "keywords": [],
   "author": "",
