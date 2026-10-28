@@ -10,23 +10,27 @@ export async function GET() {
 
     const [
       totalOrders,
-      paidOrders,
+      revenueAggregate,
       pendingOrders,
       totalProducts,
-      lowStockProducts,
-      totalCustomers,
-      recentOrders,
-      customRequestsCount,
     ] = await Promise.all([
       prisma.order.count(),
-      prisma.order.findMany({
+      prisma.order.aggregate({
+        _sum: { total: true },
         where: { paymentStatus: 'PAID' },
-        select: { total: true },
       }),
       prisma.order.count({
         where: { fulfillmentStatus: { in: ['NEW', 'CONFIRMED', 'PREPARING'] } },
       }),
       prisma.product.count({ where: { active: true } }),
+    ]);
+
+    const [
+      lowStockProducts,
+      totalCustomers,
+      recentOrders,
+      customRequestsCount,
+    ] = await Promise.all([
       prisma.product.count({
         where: { trackInventory: true, stockQuantity: { lte: 10 } },
       }),
@@ -39,7 +43,7 @@ export async function GET() {
       prisma.customRequest.count({ where: { status: 'PENDING_REVIEW' } }),
     ]);
 
-    const totalRevenue = paidOrders.reduce((sum, o) => sum + o.total, 0);
+    const totalRevenue = revenueAggregate._sum.total || 0;
 
     return NextResponse.json({
       metrics: {

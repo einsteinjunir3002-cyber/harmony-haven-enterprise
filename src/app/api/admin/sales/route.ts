@@ -30,26 +30,9 @@ export async function GET(request: Request) {
       whereClause.createdAt = dateFilter;
     }
 
-    const [allOrders, paidOrders, brands] = await Promise.all([
+    const [allOrders, brands] = await Promise.all([
       prisma.order.findMany({
         where: whereClause,
-        include: {
-          payments: true,
-          items: {
-            include: {
-              product: {
-                select: { id: true, name: true, brandId: true },
-              },
-            },
-          },
-        },
-        orderBy: { createdAt: 'desc' },
-      }),
-      prisma.order.findMany({
-        where: {
-          ...whereClause,
-          paymentStatus: 'PAID',
-        },
         include: {
           payments: true,
           items: {
@@ -66,6 +49,8 @@ export async function GET(request: Request) {
         select: { id: true, name: true, slug: true, primaryColor: true },
       }),
     ]);
+
+    const paidOrders = allOrders.filter((o) => o.paymentStatus === 'PAID');
 
     const totalRevenue = paidOrders.reduce((sum, o) => sum + o.total, 0);
     const totalOrdersCount = allOrders.length;
