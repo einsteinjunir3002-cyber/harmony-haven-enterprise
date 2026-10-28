@@ -11,6 +11,7 @@ import {
   Heart,
   ArrowRight,
   RefreshCw,
+  Sparkles,
 } from 'lucide-react';
 import { formatCurrency, formatDate, ORDER_STATUS_FLOW } from '@/lib/utils';
 
@@ -156,14 +157,24 @@ export default function AdminDashboardPage() {
           </p>
         </div>
 
-        <button
-          onClick={fetchMetrics}
-          className="px-3.5 py-2 rounded-xl bg-white border border-stone-200 text-stone-700 hover:text-stone-900 hover:bg-stone-50 text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-2xs"
-          title="Refresh numbers"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-          <span>Refresh Numbers</span>
-        </button>
+        <div className="flex items-center gap-2.5">
+          <Link
+            href="/admin/settings#home-banner"
+            className="px-3.5 py-2 rounded-xl bg-gold-400/20 hover:bg-gold-400/30 text-stone-900 border border-gold-400/40 text-xs font-bold flex items-center gap-1.5 transition-colors shadow-2xs"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-gold-700" />
+            <span>Edit Home Pictures & Banner</span>
+          </Link>
+
+          <button
+            onClick={fetchMetrics}
+            className="px-3.5 py-2 rounded-xl bg-white border border-stone-200 text-stone-700 hover:text-stone-900 hover:bg-stone-50 text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-2xs"
+            title="Refresh numbers"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+            <span>Refresh Numbers</span>
+          </button>
+        </div>
       </div>
 
       {/* Metrics Cards Grid */}

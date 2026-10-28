@@ -19,6 +19,10 @@ import {
   X,
   Volume2,
   ExternalLink,
+  Upload,
+  Image as ImageIcon,
+  Eye,
+  ArrowRight,
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 
@@ -28,6 +32,34 @@ export default function AdminSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
+
+  // Home Top Banner & 2 Pictures CMS
+  const [heroHeadline, setHeroHeadline] = useState('Small Hands, Wide Reach');
+  const [heroBadge, setHeroBadge] = useState('HARMONY HAVEN ENTERPRISE');
+  const [heroSubheadline, setHeroSubheadline] = useState(
+    'We make yummy home-cooked Ghanaian food and beautiful gift boxes that bring happiness to you and your loved ones.'
+  );
+  const [heroCtaExplore, setHeroCtaExplore] = useState('See What We Sell');
+  const [heroCtaExploreLink, setHeroCtaExploreLink] = useState('#brands-section');
+  const [heroCtaOrder, setHeroCtaOrder] = useState('Order Food or Gifts');
+  const [heroCtaOrderLink, setHeroCtaOrderLink] = useState('/order');
+  const [heroBadge1, setHeroBadge1] = useState('Fresh Homemade Meals');
+  const [heroBadge2, setHeroBadge2] = useState('Bespoke Poetry & Gifting');
+  const [heroBadge3, setHeroBadge3] = useState('Ghana-wide Delivery');
+
+  // Card 1 (Food / Kowah's Dishes)
+  const [card1Image, setCard1Image] = useState('/images/gallery/WhatsApp Image 2026-09-03 at 10.22.02 PM.jpeg');
+  const [card1Badge, setCard1Badge] = useState("Kowah's Dishes");
+  const [card1Title, setCard1Title] = useState('Cook Less, Live More!');
+  const [card1Link, setCard1Link] = useState('/kowahs-dishes');
+  const [uploadingCard1, setUploadingCard1] = useState(false);
+
+  // Card 2 (Gifting / 4U Heartlines)
+  const [card2Image, setCard2Image] = useState('/images/gallery/WhatsApp Image 2026-09-03 at 10.57.01 PM.jpeg');
+  const [card2Badge, setCard2Badge] = useState('4U HEARTLINES');
+  const [card2Title, setCard2Title] = useState('Where feelings find their words');
+  const [card2Link, setCard2Link] = useState('/4u-heartlines');
+  const [uploadingCard2, setUploadingCard2] = useState(false);
 
   // Editable CMS fields
   const [visionText, setVisionText] = useState('');
@@ -68,6 +100,31 @@ export default function AdminSettingsPage() {
 
       if (data.contentBlocks) {
         setContentBlocks(data.contentBlocks);
+
+        const heroBlock = data.contentBlocks.find((b: any) => b.key === 'home.hero');
+        if (heroBlock) {
+          try {
+            const obj = JSON.parse(heroBlock.contentJson);
+            if (obj.headline) setHeroHeadline(obj.headline);
+            if (obj.badge) setHeroBadge(obj.badge);
+            if (obj.subheadline) setHeroSubheadline(obj.subheadline);
+            if (obj.ctaExplore) setHeroCtaExplore(obj.ctaExplore);
+            if (obj.ctaExploreLink) setHeroCtaExploreLink(obj.ctaExploreLink);
+            if (obj.ctaOrder) setHeroCtaOrder(obj.ctaOrder);
+            if (obj.ctaOrderLink) setHeroCtaOrderLink(obj.ctaOrderLink);
+            if (obj.badge1) setHeroBadge1(obj.badge1);
+            if (obj.badge2) setHeroBadge2(obj.badge2);
+            if (obj.badge3) setHeroBadge3(obj.badge3);
+            if (obj.card1Image) setCard1Image(obj.card1Image);
+            if (obj.card1Badge) setCard1Badge(obj.card1Badge);
+            if (obj.card1Title) setCard1Title(obj.card1Title);
+            if (obj.card1Link) setCard1Link(obj.card1Link);
+            if (obj.card2Image) setCard2Image(obj.card2Image);
+            if (obj.card2Badge) setCard2Badge(obj.card2Badge);
+            if (obj.card2Title) setCard2Title(obj.card2Title);
+            if (obj.card2Link) setCard2Link(obj.card2Link);
+          } catch {}
+        }
 
         const vis = data.contentBlocks.find((b: any) => b.key === 'about.vision');
         if (vis) {
@@ -132,13 +189,71 @@ export default function AdminSettingsPage() {
     fetchSettings();
   }, []);
 
-  const handleSaveSettings = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleUploadBannerImage = async (file: File, cardNum: 1 | 2) => {
+    if (cardNum === 1) setUploadingCard1(true);
+    if (cardNum === 2) setUploadingCard2(true);
+
+    try {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          if (cardNum === 1) setCard1Image(e.target.result as string);
+          if (cardNum === 2) setCard2Image(e.target.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch('/api/uploads', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (data?.url) {
+        if (cardNum === 1) setCard1Image(data.url);
+        if (cardNum === 2) setCard2Image(data.url);
+      }
+    } catch (err) {
+      console.error('Failed to upload banner image:', err);
+    } finally {
+      if (cardNum === 1) setUploadingCard1(false);
+      if (cardNum === 2) setUploadingCard2(false);
+    }
+  };
+
+  const handleSaveSettings = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setSaving(true);
     setMessage('');
 
     try {
       const updatedBlocks = [
+        {
+          key: 'home.hero',
+          title: 'Home Page Hero & Top Banner',
+          section: 'home',
+          contentJson: JSON.stringify({
+            headline: heroHeadline,
+            badge: heroBadge,
+            subheadline: heroSubheadline,
+            ctaExplore: heroCtaExplore,
+            ctaExploreLink: heroCtaExploreLink,
+            ctaOrder: heroCtaOrder,
+            ctaOrderLink: heroCtaOrderLink,
+            badge1: heroBadge1,
+            badge2: heroBadge2,
+            badge3: heroBadge3,
+            card1Image,
+            card1Badge,
+            card1Title,
+            card1Link,
+            card2Image,
+            card2Badge,
+            card2Title,
+            card2Link,
+          }),
+        },
         {
           key: 'about.vision',
           title: 'Vision',
@@ -424,6 +539,414 @@ export default function AdminSettingsPage() {
               placeholder="e.g. Free delivery on orders over GH₵300 in Accra!"
               className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-xs"
             />
+          </div>
+        </div>
+
+        {/* 2.5 HOME PAGE TOP BANNER & 2 PICTURES CMS */}
+        <div id="home-banner" className="bg-white p-6 sm:p-8 rounded-3xl border-2 border-gold-400/40 shadow-sm space-y-8 scroll-mt-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-stone-100 pb-5">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-harmony-800 to-harmony-950 text-gold-400 flex items-center justify-center shadow-xs">
+                <ImageIcon className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="font-serif font-bold text-xl text-stone-950">Home Page Top Banner & Pictures</h2>
+                  <span className="px-2.5 py-0.5 rounded-full bg-gold-100 text-gold-800 text-[10px] font-bold uppercase tracking-wider">
+                    Live On Top of Home Page
+                  </span>
+                </div>
+                <p className="text-xs text-stone-500 mt-0.5">
+                  Change the two pictures on the top of your shop, the words on each picture, the main title, and buttons.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2.5">
+              <Link
+                href="/home"
+                target="_blank"
+                className="px-3.5 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold flex items-center gap-1.5 transition-colors"
+              >
+                <Eye className="w-3.5 h-3.5" />
+                <span>See Live Home</span>
+              </Link>
+              <button
+                type="button"
+                onClick={() => handleSaveSettings()}
+                disabled={saving}
+                className="px-4 py-2 rounded-xl bg-harmony-900 hover:bg-harmony-950 text-white text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-xs disabled:opacity-50"
+              >
+                <Save className="w-3.5 h-3.5 text-gold-400" />
+                <span>{saving ? 'Saving...' : 'Save Banner'}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* TWO PICTURES CONFIGURATION */}
+          <div className="space-y-4">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-widest text-gold-700 block">
+                Top Banner Pictures (The 2 Pictures)
+              </span>
+              <p className="text-xs text-stone-500">
+                Tap &ldquo;Choose Picture from Phone/Computer&rdquo; to upload any photo, or paste a link.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* CARD 1: FOOD POT / KOWAH'S DISHES */}
+              <div className="p-5 rounded-2xl border-2 border-amber-200/80 bg-amber-50/40 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider text-amber-900 flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+                    Picture 1 (Food / Kowah&apos;s Dishes)
+                  </span>
+                  <span className="text-[11px] text-stone-400 font-medium">Top / Main Card</span>
+                </div>
+
+                {/* Live Preview */}
+                <div className="relative rounded-xl overflow-hidden shadow-md border border-amber-300/60 bg-stone-900 aspect-16/9 group">
+                  <img
+                    src={card1Image}
+                    alt={card1Badge}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-stone-950/90 via-stone-950/40 to-transparent flex flex-col justify-end p-3.5">
+                    <span className="text-[10px] font-bold tracking-widest text-gold-400 uppercase">
+                      {card1Badge || "Kowah's Dishes"}
+                    </span>
+                    <h4 className="font-serif font-bold text-white text-sm">
+                      {card1Title || "Cook Less, Live More!"}
+                    </h4>
+                  </div>
+                  {uploadingCard1 && (
+                    <div className="absolute inset-0 bg-stone-950/75 flex items-center justify-center text-white text-xs font-bold">
+                      Uploading picture...
+                    </div>
+                  )}
+                </div>
+
+                {/* Upload & Text Fields */}
+                <div className="space-y-3 pt-1 text-xs">
+                  <div>
+                    <label className="block font-bold text-stone-700 mb-1">
+                      Upload New Picture for Card 1
+                    </label>
+                    <label className="w-full py-2.5 px-3 rounded-xl border border-dashed border-amber-400 bg-white hover:bg-amber-50 text-amber-900 font-semibold cursor-pointer flex items-center justify-center gap-2 transition-colors">
+                      <Upload className="w-4 h-4 text-amber-600" />
+                      <span>{uploadingCard1 ? 'Uploading...' : 'Choose Picture from Phone/Computer'}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleUploadBannerImage(file, 1);
+                        }}
+                      />
+                    </label>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-stone-700 mb-1">
+                      Or Image URL / File Path
+                    </label>
+                    <input
+                      type="text"
+                      value={card1Image}
+                      onChange={(e) => setCard1Image(e.target.value)}
+                      placeholder="/images/gallery/... or https://..."
+                      className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white text-xs font-mono"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block font-bold text-stone-700 mb-1">
+                        Small Tag Writing
+                      </label>
+                      <input
+                        type="text"
+                        value={card1Badge}
+                        onChange={(e) => setCard1Badge(e.target.value)}
+                        placeholder="e.g. Kowah's Dishes"
+                        className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-stone-700 mb-1">
+                        Big Title on Picture
+                      </label>
+                      <input
+                        type="text"
+                        value={card1Title}
+                        onChange={(e) => setCard1Title(e.target.value)}
+                        placeholder="e.g. Cook Less, Live More!"
+                        className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-stone-700 mb-1">
+                      Where it opens when clicked
+                    </label>
+                    <input
+                      type="text"
+                      value={card1Link}
+                      onChange={(e) => setCard1Link(e.target.value)}
+                      placeholder="/kowahs-dishes"
+                      className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white text-xs font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* CARD 2: GIFT / 4U HEARTLINES */}
+              <div className="p-5 rounded-2xl border-2 border-teal-200/80 bg-teal-50/40 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider text-teal-900 flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-teal-500" />
+                    Picture 2 (Gifts / 4U Heartlines)
+                  </span>
+                  <span className="text-[11px] text-stone-400 font-medium">Floating Card</span>
+                </div>
+
+                {/* Live Preview */}
+                <div className="relative rounded-xl overflow-hidden shadow-md border border-teal-300/60 bg-harmony-950 aspect-16/9 group">
+                  <img
+                    src={card2Image}
+                    alt={card2Badge}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-harmony-950/90 via-harmony-950/40 to-transparent flex flex-col justify-end p-3.5">
+                    <span className="text-[10px] font-bold tracking-widest text-teal-300 uppercase">
+                      {card2Badge || "4U HEARTLINES"}
+                    </span>
+                    <h4 className="font-serif font-bold text-white text-sm">
+                      {card2Title || "Where feelings find their words"}
+                    </h4>
+                  </div>
+                  {uploadingCard2 && (
+                    <div className="absolute inset-0 bg-stone-950/75 flex items-center justify-center text-white text-xs font-bold">
+                      Uploading picture...
+                    </div>
+                  )}
+                </div>
+
+                {/* Upload & Text Fields */}
+                <div className="space-y-3 pt-1 text-xs">
+                  <div>
+                    <label className="block font-bold text-stone-700 mb-1">
+                      Upload New Picture for Card 2
+                    </label>
+                    <label className="w-full py-2.5 px-3 rounded-xl border border-dashed border-teal-400 bg-white hover:bg-teal-50 text-teal-900 font-semibold cursor-pointer flex items-center justify-center gap-2 transition-colors">
+                      <Upload className="w-4 h-4 text-teal-600" />
+                      <span>{uploadingCard2 ? 'Uploading...' : 'Choose Picture from Phone/Computer'}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleUploadBannerImage(file, 2);
+                        }}
+                      />
+                    </label>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-stone-700 mb-1">
+                      Or Image URL / File Path
+                    </label>
+                    <input
+                      type="text"
+                      value={card2Image}
+                      onChange={(e) => setCard2Image(e.target.value)}
+                      placeholder="/images/gallery/... or https://..."
+                      className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white text-xs font-mono"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block font-bold text-stone-700 mb-1">
+                        Small Tag Writing
+                      </label>
+                      <input
+                        type="text"
+                        value={card2Badge}
+                        onChange={(e) => setCard2Badge(e.target.value)}
+                        placeholder="e.g. 4U HEARTLINES"
+                        className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-stone-700 mb-1">
+                        Big Title on Picture
+                      </label>
+                      <input
+                        type="text"
+                        value={card2Title}
+                        onChange={(e) => setCard2Title(e.target.value)}
+                        placeholder="e.g. Where feelings find their words"
+                        className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-stone-700 mb-1">
+                      Where it opens when clicked
+                    </label>
+                    <input
+                      type="text"
+                      value={card2Link}
+                      onChange={(e) => setCard2Link(e.target.value)}
+                      placeholder="/4u-heartlines"
+                      className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white text-xs font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* WRITINGS & BUTTONS ON BANNER (OTHER SETTINGS) */}
+          <div className="pt-6 border-t border-stone-100 space-y-4 text-xs">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-widest text-gold-700 block">
+                Banner Title, Story & Buttons
+              </span>
+              <p className="text-xs text-stone-500">
+                The big headline text, description, and two main buttons on the left of the banner.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block font-bold text-stone-700 mb-1">
+                  Small Top Tag
+                </label>
+                <input
+                  type="text"
+                  value={heroBadge}
+                  onChange={(e) => setHeroBadge(e.target.value)}
+                  placeholder="HARMONY HAVEN ENTERPRISE"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 bg-white text-xs"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-stone-700 mb-1">
+                  Big Main Title
+                </label>
+                <input
+                  type="text"
+                  value={heroHeadline}
+                  onChange={(e) => setHeroHeadline(e.target.value)}
+                  placeholder="Small Hands, Wide Reach"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 bg-white text-xs font-bold"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block font-bold text-stone-700 mb-1">
+                Sub-Text / Story
+              </label>
+              <textarea
+                rows={2}
+                value={heroSubheadline}
+                onChange={(e) => setHeroSubheadline(e.target.value)}
+                placeholder="We make yummy home-cooked Ghanaian food and beautiful gift boxes..."
+                className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 bg-white text-xs"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="p-4 rounded-xl border border-stone-200 bg-stone-50/50 space-y-2">
+                <span className="font-bold text-stone-800 block">Yellow Button 1</span>
+                <div>
+                  <label className="block text-[11px] text-stone-500 mb-1">Button Writing</label>
+                  <input
+                    type="text"
+                    value={heroCtaExplore}
+                    onChange={(e) => setHeroCtaExplore(e.target.value)}
+                    placeholder="See What We Sell"
+                    className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-white text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] text-stone-500 mb-1">Where it goes</label>
+                  <input
+                    type="text"
+                    value={heroCtaExploreLink}
+                    onChange={(e) => setHeroCtaExploreLink(e.target.value)}
+                    placeholder="#brands-section"
+                    className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-white text-xs font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="p-4 rounded-xl border border-stone-200 bg-stone-50/50 space-y-2">
+                <span className="font-bold text-stone-800 block">Outlined Button 2</span>
+                <div>
+                  <label className="block text-[11px] text-stone-500 mb-1">Button Writing</label>
+                  <input
+                    type="text"
+                    value={heroCtaOrder}
+                    onChange={(e) => setHeroCtaOrder(e.target.value)}
+                    placeholder="Order Food or Gifts"
+                    className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-white text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] text-stone-500 mb-1">Where it goes</label>
+                  <input
+                    type="text"
+                    value={heroCtaOrderLink}
+                    onChange={(e) => setHeroCtaOrderLink(e.target.value)}
+                    placeholder="/order"
+                    className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-white text-xs font-mono"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label className="block font-bold text-stone-700 mb-1">Bottom Point 1</label>
+                <input
+                  type="text"
+                  value={heroBadge1}
+                  onChange={(e) => setHeroBadge1(e.target.value)}
+                  placeholder="Fresh Homemade Meals"
+                  className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white text-xs"
+                />
+              </div>
+              <div>
+                <label className="block font-bold text-stone-700 mb-1">Bottom Point 2</label>
+                <input
+                  type="text"
+                  value={heroBadge2}
+                  onChange={(e) => setHeroBadge2(e.target.value)}
+                  placeholder="Bespoke Poetry & Gifting"
+                  className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white text-xs"
+                />
+              </div>
+              <div>
+                <label className="block font-bold text-stone-700 mb-1">Bottom Point 3</label>
+                <input
+                  type="text"
+                  value={heroBadge3}
+                  onChange={(e) => setHeroBadge3(e.target.value)}
+                  placeholder="Ghana-wide Delivery"
+                  className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white text-xs"
+                />
+              </div>
+            </div>
           </div>
         </div>
 

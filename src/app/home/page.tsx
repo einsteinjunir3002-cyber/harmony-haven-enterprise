@@ -71,12 +71,25 @@ export default async function FullHomePage() {
   };
 
   const heroContent = getBlock('home.hero', {
-    headline: 'Harmony Haven Enterprise',
-    tagline: 'Small Hands, Wide Reach',
+    headline: 'Small Hands, Wide Reach',
+    badge: 'HARMONY HAVEN ENTERPRISE',
     subheadline:
       'We make yummy home-cooked Ghanaian food and beautiful gift boxes that bring happiness to you and your loved ones.',
     ctaExplore: 'See What We Sell',
+    ctaExploreLink: '#brands-section',
     ctaOrder: 'Order Food or Gifts',
+    ctaOrderLink: '/order',
+    badge1: 'Fresh Homemade Meals',
+    badge2: 'Bespoke Poetry & Gifting',
+    badge3: 'Ghana-wide Delivery',
+    card1Image: '/images/gallery/WhatsApp Image 2026-09-03 at 10.22.02 PM.jpeg',
+    card1Badge: "Kowah's Dishes",
+    card1Title: 'Cook Less, Live More!',
+    card1Link: '/kowahs-dishes',
+    card2Image: '/images/gallery/WhatsApp Image 2026-09-03 at 10.57.01 PM.jpeg',
+    card2Badge: '4U HEARTLINES',
+    card2Title: 'Where feelings find their words',
+    card2Link: '/4u-heartlines',
   });
 
   const welcomeContent = getBlock('home.welcome', {
@@ -107,15 +120,12 @@ export default async function FullHomePage() {
             <div className="lg:col-span-7 space-y-8 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-gold-400/30 text-gold-300 text-xs font-semibold tracking-wider uppercase">
                 <Sparkles className="w-4 h-4 text-gold-400" />
-                <span>HARMONY HAVEN ENTERPRISE</span>
+                <span>{heroContent.badge || 'HARMONY HAVEN ENTERPRISE'}</span>
               </div>
 
               <div className="space-y-4">
                 <h1 className="font-serif font-bold text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight leading-tight">
-                  Small Hands,{' '}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-300 via-gold-200 to-gold-400">
-                    Wide Reach
-                  </span>
+                  {heroContent.headline || 'Small Hands, Wide Reach'}
                 </h1>
                 <p className="text-lg sm:text-xl text-stone-300 max-w-2xl font-light leading-relaxed">
                   {heroContent.subheadline}
@@ -124,18 +134,18 @@ export default async function FullHomePage() {
 
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
                 <Link
-                  href="#brands-section"
+                  href={heroContent.ctaExploreLink || '#brands-section'}
                   className="w-full sm:w-auto px-8 py-4 rounded-full bg-gold-500 hover:bg-gold-400 text-stone-950 font-bold text-sm tracking-wider uppercase shadow-xl hover:shadow-gold-500/20 transition-all flex items-center justify-center gap-2 group"
                 >
-                  <span>{heroContent.ctaExplore}</span>
+                  <span>{heroContent.ctaExplore || 'See What We Sell'}</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
 
                 <Link
-                  href="/order"
+                  href={heroContent.ctaOrderLink || '/order'}
                   className="w-full sm:w-auto px-8 py-4 rounded-full bg-white/10 hover:bg-white/20 text-white font-semibold text-sm tracking-wider uppercase border border-white/20 backdrop-blur-md transition-all flex items-center justify-center"
                 >
-                  <span>{heroContent.ctaOrder}</span>
+                  <span>{heroContent.ctaOrder || 'Order Food or Gifts'}</span>
                 </Link>
               </div>
 
@@ -143,15 +153,15 @@ export default async function FullHomePage() {
               <div className="pt-6 grid grid-cols-2 sm:grid-cols-3 gap-4 text-xs text-stone-400 border-t border-white/10">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-gold-400 shrink-0" />
-                  <span>Fresh Homemade Meals</span>
+                  <span>{heroContent.badge1 || 'Fresh Homemade Meals'}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-gold-400 shrink-0" />
-                  <span>Bespoke Poetry & Gifting</span>
+                  <span>{heroContent.badge2 || 'Bespoke Poetry & Gifting'}</span>
                 </div>
                 <div className="flex items-center gap-2 col-span-2 sm:col-span-1">
                   <CheckCircle2 className="w-4 h-4 text-gold-400 shrink-0" />
-                  <span>Ghana-wide Delivery</span>
+                  <span>{heroContent.badge3 || 'Ghana-wide Delivery'}</span>
                 </div>
               </div>
             </div>
@@ -160,38 +170,44 @@ export default async function FullHomePage() {
             <div className="lg:col-span-5 relative">
               <div className="relative mx-auto max-w-md lg:max-w-none">
                 {/* Kowah's Dishes Card Preview */}
-                <div className="relative z-20 rounded-2xl overflow-hidden shadow-2xl border-2 border-gold-400/40 bg-stone-900 group">
+                <Link
+                  href={heroContent.card1Link || '/kowahs-dishes'}
+                  className="block relative z-20 rounded-2xl overflow-hidden shadow-2xl border-2 border-gold-400/40 bg-stone-900 group cursor-pointer"
+                >
                   <img
-                    src="/images/gallery/WhatsApp Image 2026-09-03 at 10.22.02 PM.jpeg"
-                    alt="Kowah's Dishes Food Pot"
+                    src={heroContent.card1Image || '/images/gallery/WhatsApp Image 2026-09-03 at 10.22.02 PM.jpeg'}
+                    alt={heroContent.card1Badge || "Kowah's Dishes Food Pot"}
                     className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="p-4 bg-gradient-to-t from-stone-950 via-stone-900 to-transparent">
                     <span className="text-[10px] font-bold tracking-widest text-gold-400 uppercase">
-                      Kowah&apos;s Dishes
+                      {heroContent.card1Badge || "Kowah's Dishes"}
                     </span>
                     <h3 className="font-serif font-bold text-white text-base">
-                      Cook Less, Live More!
+                      {heroContent.card1Title || "Cook Less, Live More!"}
                     </h3>
                   </div>
-                </div>
+                </Link>
 
                 {/* 4U Heartlines Floating Card Preview */}
-                <div className="relative -mt-12 ml-10 z-30 rounded-2xl overflow-hidden shadow-2xl border-2 border-teal-400/40 bg-harmony-950 group">
+                <Link
+                  href={heroContent.card2Link || '/4u-heartlines'}
+                  className="block relative -mt-12 ml-10 z-30 rounded-2xl overflow-hidden shadow-2xl border-2 border-teal-400/40 bg-harmony-950 group cursor-pointer"
+                >
                   <img
-                    src="/images/gallery/WhatsApp Image 2026-09-03 at 10.57.01 PM.jpeg"
-                    alt="4U Heartlines Gift Experience"
+                    src={heroContent.card2Image || '/images/gallery/WhatsApp Image 2026-09-03 at 10.57.01 PM.jpeg'}
+                    alt={heroContent.card2Badge || "4U Heartlines Gift Experience"}
                     className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="p-4 bg-gradient-to-t from-harmony-950 via-harmony-900 to-transparent">
                     <span className="text-[10px] font-bold tracking-widest text-teal-300 uppercase">
-                      4U HEARTLINES
+                      {heroContent.card2Badge || "4U HEARTLINES"}
                     </span>
                     <h3 className="font-serif font-bold text-white text-base">
-                      Where feelings find their words
+                      {heroContent.card2Title || "Where feelings find their words"}
                     </h3>
                   </div>
-                </div>
+                </Link>
               </div>
             </div>
           </div>
