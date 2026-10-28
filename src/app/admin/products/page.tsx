@@ -32,6 +32,7 @@ export default function AdminProductsPage() {
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
   const [newImageUrl, setNewImageUrl] = useState('');
 
   const fetchProducts = async () => {
@@ -85,7 +86,7 @@ export default function AdminProductsPage() {
       active: true,
       featured: true,
       stockQuantity: 100,
-      images: ['/images/gallery/WhatsApp Image 2026-09-03 at 10.20.31 PM.jpeg'],
+      images: [],
       variants: [],
     });
     setNewImageUrl('');
@@ -258,6 +259,8 @@ export default function AdminProductsPage() {
       if (!res.ok) throw new Error(data.error || 'Failed to save product');
 
       setIsModalOpen(false);
+      setSuccessMsg(editingProduct.id ? 'Product updated successfully.' : 'Product created successfully.');
+      setTimeout(() => setSuccessMsg(''), 4500);
       await fetchProducts();
     } catch (err: any) {
       setErrorMsg(err.message || 'Error saving product');
@@ -266,13 +269,29 @@ export default function AdminProductsPage() {
     }
   };
 
-  const handleDeleteProduct = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this product?')) return;
+  const handleDeleteProduct = async (prod: any) => {
+    const id = typeof prod === 'string' ? prod : prod.id;
+    const name = typeof prod === 'string' ? 'this product' : prod.name;
+    if (!confirm(`Are you sure you want to permanently delete "${name}"? This action cannot be undone.`)) return;
+
     try {
-      await fetch(`/api/admin/products?id=${id}`, { method: 'DELETE' });
+      // Optimistic instant removal from table
+      setProducts((prev) => prev.filter((p) => p.id !== id));
+
+      const res = await fetch(`/api/admin/products?id=${id}`, {
+        method: 'DELETE',
+        headers: { 'Cache-Control': 'no-cache, no-store' },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to delete product from database');
+
+      setSuccessMsg(`"${name}" was deleted permanently.`);
+      setTimeout(() => setSuccessMsg(''), 4500);
       await fetchProducts();
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
+      alert(`Deletion Error: ${e.message || 'Could not delete product'}`);
+      await fetchProducts();
     }
   };
 
@@ -321,6 +340,13 @@ export default function AdminProductsPage() {
           </button>
         </div>
       </div>
+
+      {successMsg && (
+        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-3 shadow-xs">
+          <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+          <span className="font-bold">{successMsg}</span>
+        </div>
+      )}
 
       {/* Search Input */}
       <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-xs flex items-center gap-3">
@@ -426,16 +452,24 @@ export default function AdminProductsPage() {
                         </span>
                       </td>
                       <td className="py-4 px-6 text-right space-x-2">
+                        <Link
+                          href={`/products/${prod.slug}`}
+                          target="_blank"
+                          className="p-1.5 rounded-lg text-stone-500 hover:text-gold-700 hover:bg-stone-100 transition-colors inline-block align-middle"
+                          title="View on Customer Storefront"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </Link>
                         <button
                           onClick={() => handleOpenEdit(prod)}
-                          className="p-1.5 rounded-lg text-stone-500 hover:text-harmony-900 hover:bg-stone-100 transition-colors"
+                          className="p-1.5 rounded-lg text-stone-500 hover:text-harmony-900 hover:bg-stone-100 transition-colors inline-block align-middle"
                           title="Edit Product"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => handleDeleteProduct(prod.id)}
-                          className="p-1.5 rounded-lg text-stone-500 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                          onClick={() => handleDeleteProduct(prod)}
+                          className="p-1.5 rounded-lg text-stone-500 hover:text-rose-600 hover:bg-rose-50 transition-colors inline-block align-middle"
                           title="Delete Product"
                         >
                           <Trash2 className="w-4 h-4" />

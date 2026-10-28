@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { slugify } from '@/lib/utils';
@@ -119,6 +120,17 @@ export async function POST(request: Request) {
       return prod;
     });
 
+    try {
+      revalidatePath('/', 'page');
+      revalidatePath('/home', 'page');
+      revalidatePath('/kowahs-dishes', 'page');
+      revalidatePath('/4u-heartlines', 'page');
+      revalidatePath('/products/[slug]', 'page');
+      revalidatePath('/api/products');
+    } catch (e) {
+      console.warn('Revalidation notice:', e);
+    }
+
     return NextResponse.json({ success: true, product });
   } catch (error: any) {
     console.error('Admin product create error:', error);
@@ -218,6 +230,18 @@ export async function PUT(request: Request) {
       return prod;
     });
 
+    try {
+      revalidatePath('/', 'page');
+      revalidatePath('/home', 'page');
+      revalidatePath('/kowahs-dishes', 'page');
+      revalidatePath('/4u-heartlines', 'page');
+      revalidatePath(`/products/${updated.slug}`, 'page');
+      revalidatePath('/products/[slug]', 'page');
+      revalidatePath('/api/products');
+    } catch (e) {
+      console.warn('Revalidation notice:', e);
+    }
+
     return NextResponse.json({ success: true, product: updated });
   } catch (error: any) {
     console.error('Admin product update error:', error);
@@ -236,8 +260,24 @@ export async function DELETE(request: Request) {
     }
 
     await prisma.$transaction(async (tx) => {
+      // Unlink any order items gracefully to avoid foreign key blocks
+      await tx.orderItem.updateMany({
+        where: { productId: id },
+        data: { productId: null, variantId: null },
+      });
+
+      // Unlink any media entries
+      await tx.media.updateMany({
+        where: { productId: id },
+        data: { productId: null },
+      });
+
+      // Delete all variants for this product
       await tx.productVariant.deleteMany({ where: { productId: id } });
+
+      // Delete the product itself
       await tx.product.delete({ where: { id } });
+
       await tx.auditLog.create({
         data: {
           actorId: user.id,
@@ -249,8 +289,27 @@ export async function DELETE(request: Request) {
       });
     });
 
-    return NextResponse.json({ success: true, message: 'Product deleted' });
+    try {
+      revalidatePath('/', 'page');
+      revalidatePath('/home', 'page');
+      revalidatePath('/kowahs-dishes', 'page');
+      revalidatePath('/4u-heartlines', 'page');
+      revalidatePath('/products/[slug]', 'page');
+      revalidatePath('/api/products');
+    } catch (e) {
+      console.warn('Revalidation notice:', e);
+    }
+
+    return NextResponse.json(
+      { success: true, message: 'Product deleted successfully' },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+        },
+      }
+    );
   } catch (error: any) {
+    console.error('Delete product error:', error);
     return NextResponse.json({ error: error.message || 'Failed to delete product' }, { status: 500 });
   }
 }

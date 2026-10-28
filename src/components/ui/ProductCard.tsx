@@ -2,9 +2,10 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ShoppingBag, ArrowRight, Sparkles, Heart, Utensils } from 'lucide-react';
+import { ShoppingBag, ArrowRight, Sparkles, Heart, Utensils, Edit2 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
 
 interface ProductCardProps {
   product: {
@@ -38,6 +39,10 @@ interface ProductCardProps {
 
 export function ProductCard({ product, compact = false }: ProductCardProps) {
   const { addItem } = useCart();
+  const { user } = useAuth();
+
+  const isAdmin =
+    user && (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN' || user.role === 'STAFF');
 
   let imageList: string[] = [];
   try {
@@ -46,8 +51,14 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
     imageList = [];
   }
 
-  const primaryImage =
-    imageList[0] || '/images/gallery/WhatsApp Image 2026-09-03 at 10.20.31 PM.jpeg';
+  const getFallbackImage = (brandSlug?: string) => {
+    if (brandSlug === '4u-heartlines') {
+      return '/images/gallery/WhatsApp Image 2026-09-03 at 10.31.47 PM.jpeg';
+    }
+    return '/images/gallery/WhatsApp Image 2026-09-03 at 10.31.46 PM.jpeg';
+  };
+
+  const primaryImage = imageList[0] || getFallbackImage(product.brand?.slug);
 
   const isKowah = product.brand?.slug === 'kowahs-dishes';
   const isHeartlines = product.brand?.slug === '4u-heartlines';
@@ -109,11 +120,21 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
         </div>
 
         {/* Customization / Service Indicator */}
-        {(product.type === 'CUSTOM_PRODUCT' || product.type === 'SERVICE') && (
-          <div className="absolute top-3 right-3 bg-gold-400 text-stone-950 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 shadow-xs">
-            <Sparkles className="w-3 h-3" />
-            <span>Personalizable</span>
-          </div>
+        {/* Admin Quick Edit Button */}
+        {isAdmin && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              window.location.href = `/products/${product.slug}?edit=true`;
+            }}
+            className="absolute bottom-3 right-3 px-2.5 py-1 rounded-full bg-stone-900/85 hover:bg-gold-500 text-white hover:text-stone-950 font-bold text-[10px] uppercase tracking-wider shadow-md backdrop-blur-xs flex items-center gap-1 z-10 transition-all"
+            title="Edit Product Details"
+          >
+            <Edit2 className="w-3 h-3 text-gold-400" />
+            <span>Edit</span>
+          </button>
         )}
       </Link>
 

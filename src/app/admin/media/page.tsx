@@ -55,20 +55,23 @@ export default function SunflowerMediaPage() {
     { id: '25', title: 'Founder Portrait - Alberta Glory', url: '/images/gallery/alberta-glory-founder.jpg', category: 'FOUNDER', mimeType: 'image/jpeg' },
   ];
 
-  const [items, setItems] = useState<any[]>(staticMediaList);
+  const [items, setItems] = useState<any[]>([]);
 
   const fetchMedia = async () => {
     try {
-      const res = await fetch('/api/admin/media');
+      const res = await fetch(`/api/admin/media?_t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await res.json();
-      if (data.media && data.media.length > 0) {
-        // Merge DB media with any static entries not yet in DB
-        const dbUrls = new Set(data.media.map((m: any) => m.url));
-        const missingStatic = staticMediaList.filter((s) => !dbUrls.has(s.url));
-        setItems([...data.media, ...missingStatic]);
+      if (data.media) {
+        setItems(data.media);
       }
     } catch (e) {
-      console.error(e);
+      console.error('Failed to fetch media:', e);
     }
   };
 
@@ -183,18 +186,25 @@ export default function SunflowerMediaPage() {
   };
 
   const handleDeleteItem = async (item: any) => {
-    if (!confirm(`Are you sure you want to delete "${item.title}" from Sunflower Media?`)) return;
+    if (!confirm(`Are you sure you want to permanently delete "${item.title}" from Sunflower Media?`)) return;
 
     try {
-      await fetch(`/api/admin/media?id=${item.id}&url=${encodeURIComponent(item.url)}`, {
-        method: 'DELETE',
-      });
       setItems((prev) => prev.filter((i) => i.id !== item.id && i.url !== item.url));
-      setMessage('Media item removed successfully.');
-      setTimeout(() => setMessage(''), 3000);
-    } catch (e) {
+
+      const res = await fetch(`/api/admin/media?id=${item.id}&url=${encodeURIComponent(item.url)}`, {
+        method: 'DELETE',
+        headers: { 'Cache-Control': 'no-cache, no-store' },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to delete media');
+
+      setMessage(`"${item.title}" was removed permanently.`);
+      setTimeout(() => setMessage(''), 3500);
+      await fetchMedia();
+    } catch (e: any) {
       console.error(e);
-      alert('Failed to delete media item.');
+      alert(`Delete Failed: ${e.message || 'Could not delete media item'}`);
+      await fetchMedia();
     }
   };
 

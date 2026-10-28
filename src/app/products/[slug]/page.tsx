@@ -5,18 +5,31 @@ import { ProductDetailClient } from '@/components/product/ProductDetailClient';
 import { ProductCard } from '@/components/ui/ProductCard';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function ProductPage({ params }: { params: { slug: string } }) {
-  const product = await prisma.product.findUnique({
-    where: { slug: params.slug },
-    include: {
-      brand: true,
-      category: true,
-      variants: { orderBy: { priceAdjustment: 'asc' } },
-    },
-  });
+  const [product, brands, categories] = await Promise.all([
+    prisma.product.findUnique({
+      where: { slug: params.slug },
+      include: {
+        brand: true,
+        category: true,
+        variants: { orderBy: { priceAdjustment: 'asc' } },
+      },
+    }),
+    prisma.brand.findMany({
+      where: { active: true },
+      select: { id: true, name: true, slug: true },
+      orderBy: { sortOrder: 'asc' },
+    }),
+    prisma.category.findMany({
+      where: { active: true },
+      select: { id: true, name: true, slug: true, brandId: true },
+      orderBy: { sortOrder: 'asc' },
+    }),
+  ]);
 
-  if (!product || !product.active) {
+  if (!product) {
     notFound();
   }
 
@@ -36,7 +49,11 @@ export default async function ProductPage({ params }: { params: { slug: string }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-20">
-      <ProductDetailClient product={product as any} />
+      <ProductDetailClient
+        product={product as any}
+        brands={brands}
+        categories={categories}
+      />
 
       {/* Related Products Section */}
       {relatedProducts.length > 0 && (
